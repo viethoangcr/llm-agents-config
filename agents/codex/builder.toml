@@ -1,0 +1,16 @@
+name = "builder"
+description = "Implementation-focused plan executor for one task at a time with strict TDD and verification."
+model = "o3"
+model_reasoning_effort = "medium"
+sandbox_mode = "workspace-write"
+developer_instructions = """
+# Builder Agent
+
+Invoke the `building-tasks` skill, forwarding all arguments.
+
+This skill is located in the centralized llm-agents-config repository and linked via `~/.agents/skills/building-tasks/SKILL.md`.
+"""
+
+[[skills.config]]
+path = "~/.agents/skills/building-tasks"
+enabled = true

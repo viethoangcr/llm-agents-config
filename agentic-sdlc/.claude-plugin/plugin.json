@@ -1,0 +1,11 @@
+{
+  "name": "agentic-sdlc",
+  "version": "1.5.0",
+  "description": "Agentic SDLC - specialized agents for brainstorming, planning, building, executing, coding, testing, reviewing, and grooming",
+  "author": {
+    "name": "Axon Platform"
+  },
+  "repository": "https://github.com/axon-platform/agentic-sdlc",
+  "license": "MIT",
+  "keywords": ["sdlc", "planning", "tdd", "code-review", "brainstorm", "groom", "agents"]
+}

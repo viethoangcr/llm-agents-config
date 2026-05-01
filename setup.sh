@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+# setup.sh — Create symlinks from tool config dirs → central llm-agents-config repo
+# Run: bash setup.sh
+# Safe to re-run — checks for existing symlinks/files before acting.
+
+set -euo pipefail
+
+REPO="$(cd "$(dirname "$0")" && pwd)"
+echo "Central repo: $REPO"
+
+# ─── Helper ───
+link() {
+  local src="$1" dst="$2"
+  if [ -L "$dst" ]; then
+    echo "  ↻ symlink exists: $dst"
+  elif [ -e "$dst" ]; then
+    echo "  ⚠ skipping (file exists, not symlink): $dst"
+  else
+    mkdir -p "$(dirname "$dst")"
+    ln -s "$src" "$dst"
+    echo "  ✓ linked: $dst → $src"
+  fi
+}
+
+# ─── 1. OpenCode ───
+echo ""
+echo "=== OpenCode ==="
+
+# Skills — each skill directory symlinked into ~/.config/opencode/skills/
+for skill in "$REPO"/skills/*/; do
+  name=$(basename "$skill")
+  link "$skill" "$HOME/.config/opencode/skills/$name"
+done
+
+# Also link agentic-sdlc namespaced skills for plugin discovery
+for skill in "$REPO"/skills/*/; do
+  name=$(basename "$skill")
+  link "$skill" "$HOME/.config/opencode/skills/agentic-sdlc/$name"
+done
+
+# If there are OpenCode-only skills (e.g. gh-address-comments, glab-address-comments, simplify, find-skills)
+# they may already exist at ~/.config/opencode/skills/ — leave them as-is.
+
+# Context — AGENTS.md
+link "$REPO/context/AGENTS.md" "$HOME/.config/opencode/AGENTS.md"
+
+# ─── 2. Claude Code ───
+echo ""
+echo "=== Claude Code ==="
+
+# Skills — each skill directory symlinked into ~/.claude/skills/
+for skill in "$REPO"/skills/*/; do
+  name=$(basename "$skill")
+  link "$skill" "$HOME/.claude/skills/$name"
+done
+
+# Also link agentic-sdlc namespaced skills for plugin discovery
+for skill in "$REPO"/skills/*/; do
+  name=$(basename "$skill")
+  link "$skill" "$HOME/.claude/skills/agentic-sdlc/$name"
+done
+
+# Context — CLAUDE.md (imports AGENTS.md via @ syntax)
+if [ -L "$HOME/.claude/CLAUDE.md" ]; then
+  echo "  ↻ symlink exists: ~/.claude/CLAUDE.md"
+elif [ -f "$HOME/.claude/CLAUDE.md" ]; then
+  echo "  ⚠ ~/.claude/CLAUDE.md already exists — append this line manually:"
+  echo "    @~/Workspace/personal/llm-agents-config/context/AGENTS.md"
+else
+  cat > "$HOME/.claude/CLAUDE.md" << 'CLAUDE_EOF'
+@~/Workspace/personal/llm-agents-config/context/AGENTS.md
+CLAUDE_EOF
+  echo "  ✓ created ~/.claude/CLAUDE.md with @import"
+fi
+
+# Agents — symlink builder agent
+link "$REPO/agents/claude/builder.md" "$HOME/.claude/agents/builder.md"
+
+# ─── 3. Codex ───
+echo ""
+echo "=== Codex ==="
+
+# Skills — each skill directory symlinked into ~/.agents/skills/
+for skill in "$REPO"/skills/*/; do
+  name=$(basename "$skill")
+  link "$skill" "$HOME/.agents/skills/$name"
+done
+
+# Context — AGENTS.md symlink in home for Codex global context
+# Codex reads AGENTS.md from project root. For global context, use ~/.codex/AGENTS.md
+# or reference in config. We'll link to a discoverable location.
+link "$REPO/context/AGENTS.md" "$HOME/.codex/AGENTS.md"
+
+# Agent config — copy builder.toml reference (Codex needs actual file, not symlink for TOML)
+if [ ! -f "$HOME/.codex/config.toml" ] || ! grep -q "building-tasks" "$HOME/.codex/config.toml" 2>/dev/null; then
+  echo "  ℹ Add the following to ~/.codex/config.toml for the builder agent:"
+  echo ""
+  cat "$REPO/agents/codex/builder.toml"
+  echo ""
+fi
+
+# ─── 4. Project-level setup ───
+echo ""
+echo "=== Project-level (per-repo) ==="
+echo "For each project, symlink or copy AGENTS.md to the project root:"
+echo ""
+echo "  ln -sf $REPO/context/AGENTS.md /path/to/project/AGENTS.md"
+echo ""
+echo "Or add to opencode.json in each project:"
+echo ""
+echo '  { "instructions": ["~/Workspace/personal/llm-agents-config/context/AGENTS.md"] }'
+echo ""
+
+# ─── 5. Clean up old duplicates ───
+echo "=== Cleanup ==="
+echo ""
+echo "After verifying the symlinks work, you may remove old duplicate skill directories:"
+echo "  rm -rf ~/.claude/skills/brainstorming ~/.claude/skills/building-tasks ..."
+echo "  rm -rf ~/.config/opencode/skills/agentic-sdlc/brainstorming ..."
+echo ""
+echo "This script only creates symlinks — it does NOT delete existing files."
+echo "Review first, then clean up manually."
+echo ""
+echo "✅ Setup complete!"
