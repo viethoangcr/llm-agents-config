@@ -44,6 +44,12 @@ done
 # Context — AGENTS.md
 link "$REPO/context/AGENTS.md" "$HOME/.config/opencode/AGENTS.md"
 
+# Agents — symlink each agent definition
+for agent in "$REPO"/agents/opencode/*.md; do
+  name=$(basename "${agent%.md}")
+  link "$agent" "$HOME/.config/opencode/agents/$name.md"
+done
+
 # ─── 2. Claude Code ───
 echo ""
 echo "=== Claude Code ==="
@@ -73,8 +79,11 @@ CLAUDE_EOF
   echo "  ✓ created ~/.claude/CLAUDE.md with @import"
 fi
 
-# Agents — symlink builder agent
-link "$REPO/agents/claude/builder.md" "$HOME/.claude/agents/builder.md"
+# Agents — symlink each agent definition
+for agent in "$REPO"/agents/claude/*.md; do
+  name=$(basename "${agent%.md}")
+  link "$agent" "$HOME/.claude/agents/$name.md"
+done
 
 # ─── 3. Codex ───
 echo ""
@@ -91,13 +100,16 @@ done
 # or reference in config. We'll link to a discoverable location.
 link "$REPO/context/AGENTS.md" "$HOME/.codex/AGENTS.md"
 
-# Agent config — copy builder.toml reference (Codex needs actual file, not symlink for TOML)
-if [ ! -f "$HOME/.codex/config.toml" ] || ! grep -q "building-tasks" "$HOME/.codex/config.toml" 2>/dev/null; then
-  echo "  ℹ Add the following to ~/.codex/config.toml for the builder agent:"
-  echo ""
-  cat "$REPO/agents/codex/builder.toml"
-  echo ""
-fi
+# Agent config — print TOML references (Codex needs actual file, not symlink for TOML)
+for toml in "$REPO"/agents/codex/*.toml; do
+  name=$(basename "${toml%.toml}")
+  if [ ! -f "$HOME/.codex/config.toml" ] || ! grep -q "$name" "$HOME/.codex/config.toml" 2>/dev/null; then
+    echo "  ℹ Add the following to ~/.codex/config.toml for the $name agent:"
+    echo ""
+    cat "$toml"
+    echo ""
+  fi
+done
 
 # ─── 4. Project-level setup ───
 echo ""

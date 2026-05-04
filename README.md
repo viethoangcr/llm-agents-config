@@ -12,12 +12,11 @@ llm-agents-config/
 │   ├── brainstorming/
 │   ├── building-tasks/
 │   ├── executing-plans/
-│   ├── grooming-backlog/
+│   ├── mermaid-diagram-specialist/
 │   ├── reviewing-code/
 │   ├── testing-code/
 │   ├── writing-code/
-│   ├── writing-plans/
-│   └── writing-specs/
+│   └── writing-plans/
 ├── agents/                    # Per-tool agent definitions
 │   ├── claude/                # Claude Code agents
 │   ├── codex/                 # Codex agents
