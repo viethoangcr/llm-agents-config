@@ -1,6 +1,6 @@
 ---
 description: Execute implementation tasks from plans with strict TDD discipline.
-mode: primary
+mode: all
 permission:
   edit: allow
   bash: allow
