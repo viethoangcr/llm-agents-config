@@ -8,13 +8,23 @@ set -euo pipefail
 REPO="$(cd "$(dirname "$0")" && pwd)"
 echo "Central repo: $REPO"
 
+SKIPPED_PATHS=()
+
 # ─── Helper ───
 link() {
   local src="$1" dst="$2"
   if [ -L "$dst" ]; then
-    echo "  ↻ symlink exists: $dst"
+    local current
+    current="$(readlink "$dst")"
+    if [ "$current" = "$src" ]; then
+      echo "  ↻ symlink exists: $dst"
+    else
+      ln -sfn "$src" "$dst"
+      echo "  ↻ updated symlink: $dst → $src"
+    fi
   elif [ -e "$dst" ]; then
     echo "  ⚠ skipping (file exists, not symlink): $dst"
+    SKIPPED_PATHS+=("$dst")
   else
     mkdir -p "$(dirname "$dst")"
     ln -s "$src" "$dst"
@@ -45,10 +55,26 @@ done
 link "$REPO/context/AGENTS.md" "$HOME/.config/opencode/AGENTS.md"
 
 # Agents — symlink each agent definition
+# OpenCode auto-discovers markdown agents from this directory using YAML frontmatter.
 for agent in "$REPO"/agents/opencode/*.md; do
   name=$(basename "${agent%.md}")
   link "$agent" "$HOME/.config/opencode/agents/$name.md"
 done
+
+echo ""
+echo "=== OpenCode verification ==="
+if command -v opencode >/dev/null 2>&1; then
+  if opencode agent list 2>/dev/null | grep -q '^ask (primary)$'; then
+    echo "  ✓ OpenCode detected ask (primary)"
+  else
+    echo "  ⚠ OpenCode did not detect ask (primary)"
+    echo "    Check for a blocking non-symlink at ~/.config/opencode/agents/ask.md"
+    echo "    Restart OpenCode after setup if it was already running"
+  fi
+  echo "  ℹ Primary agents are selected with Tab or 'opencode --agent ask'"
+else
+  echo "  ℹ opencode CLI not found; skipped agent verification"
+fi
 
 # ─── 2. Claude Code ───
 echo ""
@@ -132,5 +158,12 @@ echo "  rm -rf ~/.config/opencode/skills/agentic-sdlc/brainstorming ..."
 echo ""
 echo "This script only creates symlinks — it does NOT delete existing files."
 echo "Review first, then clean up manually."
+if [ ${#SKIPPED_PATHS[@]} -gt 0 ]; then
+  echo ""
+  echo "Skipped existing non-symlink paths:"
+  for path in "${SKIPPED_PATHS[@]}"; do
+    echo "  - $path"
+  done
+fi
 echo ""
 echo "✅ Setup complete!"

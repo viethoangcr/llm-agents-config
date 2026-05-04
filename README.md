@@ -52,6 +52,8 @@ This creates symlinks from each tool's config directory to the central repo:
 | Claude Code | `~/.claude/skills/<name>` → `skills/<name>` | `~/.claude/CLAUDE.md` with `@import` |
 | Codex | `~/.agents/skills/<name>` → `skills/<name>` | `~/.codex/AGENTS.md` → `context/AGENTS.md` |
 
+For OpenCode, `setup.sh` also symlinks custom agents into `~/.config/opencode/agents/` and verifies that `ask (primary)` is discoverable when the `opencode` CLI is installed.
+
 ### Per-project setup
 
 For each project, either:
@@ -104,7 +106,9 @@ Agent definitions are per-tool since each has a different format:
 |---|---|---|
 | Claude Code | `agents/claude/` | Markdown with YAML frontmatter |
 | Codex | `agents/codex/` | TOML config |
-| OpenCode | `agents/opencode/` | Markdown + `opencode.json` `agent` section |
+| OpenCode | `agents/opencode/` | Markdown with YAML frontmatter |
+
+OpenCode primary agents are selected with `Tab` or `opencode --agent <name>`. Only subagents are invoked with `@mentions`.
 
 ## Adding a new skill
 
