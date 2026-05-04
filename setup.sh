@@ -137,19 +137,7 @@ for toml in "$REPO"/agents/codex/*.toml; do
   fi
 done
 
-# ─── 4. Project-level setup ───
-echo ""
-echo "=== Project-level (per-repo) ==="
-echo "For each project, symlink or copy AGENTS.md to the project root:"
-echo ""
-echo "  ln -sf $REPO/context/AGENTS.md /path/to/project/AGENTS.md"
-echo ""
-echo "Or add to opencode.json in each project:"
-echo ""
-echo '  { "instructions": ["~/Workspace/personal/llm-agents-config/context/AGENTS.md"] }'
-echo ""
-
-# ─── 5. Clean up old duplicates ───
+# ─── 4. Clean up old duplicates ───
 echo "=== Cleanup ==="
 echo ""
 echo "After verifying the symlinks work, you may remove old duplicate skill directories:"

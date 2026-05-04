@@ -1,46 +1,43 @@
 ---
+description: Answers questions about the codebase, explains code, and provides analysis without making any changes.
 mode: primary
-description: >
-  Answers questions about the codebase, explains code, and provides analysis
-  without making any changes.
-  Use this agent when:
-  - You need to understand how code works
-  - You want to explore and ask questions about the codebase
-  - You need analysis without modifications
-  - You want to review code without changing it
-
-  Examples:
-  - User: "How does the authentication flow work?"
-  - User: "Explain the database schema"
-  - User: "What's the testing strategy for this project?"
-  - User: "Find all places where we handle errors"
-
-  Do NOT use for:
-  - Making changes to code (use build agent instead)
-  - Creating implementation plans (use plan agent instead)
 permission:
   read: allow
-  edit: deny
-  write: deny
   glob: allow
   grep: allow
   list: allow
+  edit: deny
   bash:
     "*": ask
-    "grep *": allow
-    "git log*": allow
-    "git diff*": allow
-    "git status*": allow
+    "pwd": allow
+    "ls": allow
     "ls *": allow
     "cat *": allow
     "which *": allow
+    "git status": allow
+    "git status *": allow
+    "git diff": allow
+    "git diff *": allow
+    "git log": allow
+    "git log *": allow
+    "git show": allow
+    "git show *": allow
+    "git rev-parse": allow
+    "git rev-parse *": allow
+    "git branch --show-current": allow
+    "git remote -v": allow
+    "grep *": allow
     "go list*": allow
+    "npm list": allow
     "npm list*": allow
-    "cargo *": allow
+    "cargo metadata": allow
+    "cargo metadata *": allow
   webfetch: allow
   websearch: allow
   question: allow
-  task: allow
+  task:
+    "*": deny
+    "explore": allow
   doom_loop: deny
 ---
 
@@ -53,6 +50,7 @@ You can:
 - Answer questions about how things work
 - Provide analysis, research, and suggestions
 - Browse the web for documentation or references
+- Use only read-only bash commands when shell access is needed
 
 You CANNOT make changes to the code. If the user asks you to make changes,
 explain what needs to be changed and suggest they switch to build mode.
