@@ -35,9 +35,8 @@ permission:
   webfetch: allow
   websearch: allow
   question: allow
-  task:
-    "*": deny
-    "explore": allow
+  task: deny
+  todowrite: deny
   doom_loop: deny
 ---
 

@@ -8,6 +8,9 @@
 - `context/AGENTS.md` is the shared global instruction source symlinked into tool config dirs; keep it tool-agnostic.
 - `skills/*/SKILL.md` is the single source of truth for skills used by all tools.
 - `agents/claude/`, `agents/codex/`, and `agents/opencode/` hold tool-specific agent definitions because their formats differ.
+- `config/` contains tool config templates (`opencode.json`, `claude-settings.json`, `codex-config.toml`) that setup.sh copies to tool dirs.
+- `agents/codex/` holds Codex subagent `.toml` definitions symlinked into `~/.codex/agents/` (standalone files per Codex spec).
+- `commands/` holds OpenCode slash commands, symlinked into `~/.config/opencode/commands/`.
 - `mcp/` files are reference templates only; users copy relevant sections into their real tool configs.
 - `agentic-sdlc/` is Claude plugin compatibility: `commands/` contains slash commands, `.claude-plugin/plugin.json` has plugin metadata, and `agents/`/`skills/` mirror the central definitions.
 
