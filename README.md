@@ -8,24 +8,27 @@ Centralized configuration for AI coding agents — OpenCode, Claude Code, and Co
 llm-agents-config/
 ├── context/
 │   └── AGENTS.md              # Universal instructions (shared across all tools)
+├── config/                    # Tool config templates (copied by setup.sh)
+│   ├── opencode.json
+│   ├── claude-settings.json
+│   └── codex-config.toml
 ├── skills/                    # Single source of truth for ALL skills
 │   ├── brainstorming/
 │   ├── building-tasks/
 │   ├── executing-plans/
-│   ├── grooming-backlog/
+│   ├── frontend-design/
+│   ├── mermaid-diagram-specialist/
+│   ├── opencode-config/
 │   ├── reviewing-code/
 │   ├── testing-code/
 │   ├── writing-code/
-│   ├── writing-plans/
-│   └── writing-specs/
+│   └── writing-plans/
 ├── agents/                    # Per-tool agent definitions
-│   ├── claude/                # Claude Code agents
-│   ├── codex/                 # Codex agents
-│   └── opencode/              # OpenCode agents
-├── rules/                     # Per-tool rules (placeholder)
-│   ├── claude/
-│   ├── opencode/
-│   └── codex/
+│   ├── claude/                # Claude Code agents (ask, builder)
+│   ├── codex/                 # Codex agents (ask, builder)
+│   └── opencode/              # OpenCode agents (ask, builder, chat, explore)
+├── commands/                  # OpenCode slash commands
+│   └── clarify-plan.md
 ├── mcp/                       # MCP config reference templates
 │   ├── opencode.json
 │   ├── claude.json
@@ -47,11 +50,13 @@ bash setup.sh
 
 This creates symlinks from each tool's config directory to the central repo:
 
-| Tool | Skill symlinks | Context |
-|---|---|---|
-| OpenCode | `~/.config/opencode/skills/<name>` → `skills/<name>` | `~/.config/opencode/AGENTS.md` → `context/AGENTS.md` |
-| Claude Code | `~/.claude/skills/<name>` → `skills/<name>` | `~/.claude/CLAUDE.md` with `@import` |
-| Codex | `~/.agents/skills/<name>` → `skills/<name>` | `~/.codex/AGENTS.md` → `context/AGENTS.md` |
+| Tool | Skill symlinks | Context | Config | Agents | Commands |
+|---|---|---|---|---|---|
+| OpenCode | `~/.config/opencode/skills/<name>` → `skills/<name>` | `~/.config/opencode/AGENTS.md` → `context/AGENTS.md` | `config/opencode.json` (copy) | `agents/opencode/*.md` → into `~/.config/opencode/agents/` | `commands/*.md` → into `~/.config/opencode/commands/` |
+| Claude Code | `~/.claude/skills/<name>` → `skills/<name>` | `~/.claude/CLAUDE.md` with `@import` | `config/claude-settings.json` (copy) | `agents/claude/*.md` → `~/.claude/agents/` | — |
+| Codex | `~/.agents/skills/<name>` → `skills/<name>` | `~/.codex/AGENTS.md` → `context/AGENTS.md` | `config/codex-config.toml` (copy + edit paths) | `agents/codex/*.{toml,md}` → `~/.codex/agents/` | — |
+
+For OpenCode, `setup.sh` also verifies that `ask (primary)` and `chat (primary)` are discoverable when the `opencode` CLI is installed.
 
 ### Per-project setup
 
@@ -93,7 +98,7 @@ MCP server configs are stored as reference templates in `mcp/`. Each tool uses a
 
 | Tool | Config file | Template |
 |---|---|---|
-| OpenCode | `opencode.json` → `mcp` section | `mcp/opencode.json` |
+| OpenCode | `~/.config/opencode/opencode.json` → `mcp` section | `mcp/opencode.json` |
 | Claude Code | `.mcp.json` or `~/.claude.json` | `mcp/claude.json` |
 | Codex | `~/.codex/config.toml` → `[mcp]` sections | `mcp/codex.toml` |
 
@@ -105,7 +110,9 @@ Agent definitions are per-tool since each has a different format:
 |---|---|---|
 | Claude Code | `agents/claude/` | Markdown with YAML frontmatter |
 | Codex | `agents/codex/` | TOML config |
-| OpenCode | `agents/opencode/` | Markdown + `opencode.json` `agent` section |
+| OpenCode | `agents/opencode/` | Markdown with YAML frontmatter |
+
+OpenCode primary agents are selected with `Tab` or `opencode --agent <name>`. Only subagents are invoked with `@mentions`.
 
 ## Adding a new skill
 
@@ -121,17 +128,22 @@ Agent definitions are per-tool since each has a different format:
 
 ## Adding a skill only for one tool
 
-Create it directly in the tool's skill directory (not symlinked):
+Prefer adding skills to `skills/<name>/` in the repo so all tools can discover them.
+If truly tool-only (e.g., uses tool-specific frontmatter), create directly:
 
 - OpenCode only: `~/.config/opencode/skills/my-skill/SKILL.md`
 - Claude Code only: `~/.claude/skills/my-skill/SKILL.md`
 - Codex only: `~/.agents/skills/my-skill/SKILL.md`
 
-## Files NOT centralized
+## Files NOT symlinked (but templated)
 
-These cannot be centralized because each tool uses a different format:
+These are copied (not symlinked) because tools may write to them, but templates live in `config/`:
 
-- **Tool settings**: `~/.config/opencode/opencode.json`, `~/.claude/settings.json`, `~/.codex/config.toml`
+- **Tool settings**: `config/opencode.json` → `~/.config/opencode/opencode.json`, `config/claude-settings.json` → `~/.claude/settings.json`, `config/codex-config.toml` → `~/.codex/config.toml` (requires path edits)
 - **MCP configs**: Different JSON/TOML formats (templates provided in `mcp/`)
+- **Codex config**: `config/codex-config.toml` → `~/.codex/config.toml` (requires path edits)
+
+Truly machine-local (not centralized):
+
 - **Auto-memory**: Per-project, per-tool (`~/.claude/projects/`)
 - **Permissions/tool allowlists**: Tool-specific formats

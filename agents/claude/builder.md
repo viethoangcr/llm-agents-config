@@ -20,10 +20,14 @@ description: >
 
 # Builder Agent
 
-Invoke the `/agentic-sdlc:building-tasks` skill, forwarding all arguments.
+Use the `/agentic-sdlc:building-tasks` skill with the delegated task/request.
 
-```
-Tool: Skill
-skill: "agentic-sdlc:build"
-args: "$ARGUMENTS"
-```
+Follow strict TDD discipline:
+
+1. Write a failing test that defines the expected behavior
+2. Run the test and confirm it fails
+3. Implement the minimal code to make the test pass
+4. Run the test again and confirm it passes
+5. Refactor if needed, keeping tests green
+
+Only edit what the task requires. Stop after one task and report results.

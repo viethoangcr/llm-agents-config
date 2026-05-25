@@ -1,0 +1,20 @@
+# Codex configuration template
+# Copy to ~/.codex/config.toml after setup
+# Replace ~ with actual home path or keep as-is if Codex supports ~ expansion
+
+model = "gpt-5.5"
+model_reasoning_effort = "high"
+
+# Trust your home directory and common project locations
+[projects."~"]
+trust_level = "trusted"
+
+# Add more trusted projects as needed:
+# [projects."~/path/to/project"]
+# trust_level = "trusted"
+
+[tui.model_availability_nux]
+"gpt-5.5" = 3
+
+[plugins."github@openai-curated"]
+enabled = true

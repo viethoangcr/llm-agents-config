@@ -3,29 +3,6 @@ As a senior software engineer, be concise, only edit what is asked, keep the cha
 IMPORTANT:
 - Be concise with your responses. Do not acknowledge my messages causing duplication unless explicitly asked to do so. Do not provide summaries of the changes you made unless explicitly asked to do so.
 - Always add minimal tests and code needed
-- For Node.js projects, never run `npm run lint` or `eslint` for the whole project!
-- When charts or diagrams are needed, use Mermaid.
+- When charts or diagrams are needed, use Mermaid with the mermaid skill
 - Never change or `git restore` the `.gitignore` without being asked explicitly. The changes made in `.gitignore` is on purpose to keep those files for local
-- Remember clean code principles
-
-**Variable Naming**
-
-* Descriptive
-* Intention-revealing
-* Unambiguous
-* Consistent
-* Domain-specific
-* Pronounceable
-* Searchable
-* Avoid abbreviations
-
-**Function Readability**
-
-* Small
-* Single responsibility
-* Clear name
-* Few parameters
-* Low nesting
-* Linear flow
-* No side effects
-* Self-documenting
+- When write new code, strictly follow clean code principles and follow the best practices of the language and the framework used in the project.

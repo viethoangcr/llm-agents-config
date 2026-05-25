@@ -1,0 +1,1 @@
+/home/viethoangcr/Workspace/personal/llm-agents-config/agents/opencode/explore.md
