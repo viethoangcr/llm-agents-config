@@ -4,6 +4,8 @@ mode: all
 permission:
   edit: allow
   bash: allow
+model: opencode-go/deepseek-v4-flash
+variant: max
 ---
 
 You are a builder agent. Invoke the `building-tasks` skill for the given task.

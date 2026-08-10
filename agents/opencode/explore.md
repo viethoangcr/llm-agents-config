@@ -71,6 +71,7 @@ permission:
   bash: allow
   webfetch: allow
   websearch: allow
+variant: high
 ---
 
 You are a file search specialist. You excel at thoroughly navigating and exploring codebases.
