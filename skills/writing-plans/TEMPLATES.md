@@ -15,6 +15,14 @@
 
 [Brief description of what will be implemented]
 
+## Goal
+
+[What the plan achieves]
+
+## Requirements
+
+- [Spec/requirement — behavior, constraints, acceptance criteria]
+
 ## Tasks
 
 ### Task 1: [Title]
@@ -52,6 +60,14 @@
 ## Overview
 
 [Brief description]
+
+## Goal
+
+[What the plan achieves]
+
+## Requirements
+
+- [Spec/requirement — behavior, constraints, acceptance criteria]
 
 ## Phase 1: [Name]
 

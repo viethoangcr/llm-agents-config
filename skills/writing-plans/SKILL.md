@@ -5,44 +5,31 @@ description: Creates detailed implementation plans with builder-ready tasks, TDD
 
 # Writing Plans
 
-Spawn a planning agent. Use the Task tool with `subagent_type: "general-purpose"`.
-
-If `--draft` is provided, append the Draft Mode section to the prompt.
-
----
-
-## Agent Prompt
-
-```
-You are a senior engineer creating implementation plans with builder-ready tasks.
-
 ## Core Principle
 
-A plan is only useful if a builder agent can execute it autonomously — ambiguous tasks create cascading failures.
-
-## Do / Don't
-
-- DO break work into atomic, independently verifiable tasks
-- DO include exact file paths and function names
-- DO specify test commands that can be run to verify each task
-- DON'T create vague tasks like "improve performance"
-- DON'T skip verification steps
-
-## Task
-
-Create a plan for: $ARGUMENTS
+A plan is self-contained: it states the goal and the specs/requirements up front, so a builder agent executing its tasks needs nothing but the plan file. Ambiguous plans create cascading failures.
 
 ## Process
 
-1. **Understand** - Parse the feature/request, ask clarifying questions if ambiguous
-2. **Research** - Use Glob/Grep to understand current codebase structure, patterns, and related code
-3. **Design** - Determine approach, identify affected files, list dependencies
-4. **Decompose** - Break into ordered tasks with:
+1. **Understand** — Parse the feature/request, ask clarifying questions if ambiguous
+2. **Research** — Use Glob/Grep to understand current codebase structure, patterns, and related code
+3. **Define** — Write the goal and explicit specs/requirements (behavior, constraints, acceptance criteria). If requirements are missing, state assumptions instead of leaving gaps
+4. **Decompose** — Break into ordered tasks with:
    - Clear title and description
    - Specific files to modify
    - Test-first approach (what to test before implementing)
    - Verification command (how to confirm it works)
-5. **Document** - Save to `docs/plans/YYYYMMDD-<slug>.md`
+5. **Document** — Save to `docs/plans/YYYYMMDD-<slug>.md`
+
+## Do / Don't
+
+- DO keep the plan as short as possible while retaining all information
+- DO break work into atomic, independently verifiable tasks
+- DO include exact file paths and function names
+- DO specify test commands that can be run to verify each task
+- DO write tasks so a builder can complete them from the plan file alone
+- DON'T create vague tasks like "improve performance"
+- DON'T skip verification steps
 
 ## Impact Assessment
 
@@ -56,9 +43,6 @@ Read [TEMPLATES.md](TEMPLATES.md) for the plan output format before generating.
 
 Save to `docs/plans/YYYYMMDD-<slug>.md`.
 After creating the plan: summarize tasks, highlight risks, and note any open questions.
-```
-
----
 
 ## Draft Mode (append when --draft is used)
 
