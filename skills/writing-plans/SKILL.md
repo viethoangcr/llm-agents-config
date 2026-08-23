@@ -7,29 +7,49 @@ description: Creates detailed implementation plans with builder-ready tasks, TDD
 
 ## Core Principle
 
-A plan is self-contained: it states the goal and the specs/requirements up front, so a builder agent executing its tasks needs nothing but the plan file. Ambiguous plans create cascading failures.
+A plan is self-contained: it states the goal, the specs/requirements, and the interfaces up front, so a builder agent executing its tasks needs nothing but the plan file. Every task carries the references (files, types, code locations, interface signatures) the agent needs; the plan must never force a builder to guess or go hunting. Ambiguous plans create cascading failures.
 
 ## Process
 
 1. **Understand** — Parse the feature/request, ask clarifying questions if ambiguous
 2. **Research** — Use Glob/Grep to understand current codebase structure, patterns, and related code
-3. **Define** — Write the goal and explicit specs/requirements (behavior, constraints, acceptance criteria). If requirements are missing, state assumptions instead of leaving gaps
-4. **Decompose** — Break into ordered tasks with:
+3. **Define** — Write the goal and explicit specs/requirements (behavior, constraints, acceptance criteria). If requirements are missing, state assumptions instead of leaving gaps. Include a **Target State** diagram (and **Current State** when it clarifies or when there's an existing implementation to change)
+4. **Interface Design** — For new or updated public interfaces/modules, declare each one with its full signature: types, params, return values, error semantics. For multi-phase plans, state the high-level goal of each phase up front
+5. **Decompose** — Break into ordered tasks with:
    - Clear title and description
    - Specific files to modify
+   - References — the exact interfaces, types, symbols, and code locations the task depends on
    - Test-first approach (what to test before implementing)
    - Verification command (how to confirm it works)
-5. **Document** — Save to `docs/plans/YYYYMMDD-<slug>.md`
+6. **Review** — Thoroughly review the draft against the plan checklist before it goes to a builder. Verify self-containment (every task has everything it needs), correct signatures, complete diagrams, and per-phase goals
+7. **Document** — Save to `docs/plans/YYYYMMDD-<slug>.md`
+
+## Review Checklist
+
+A plan is only ready once all of these hold:
+
+- **Self-contained** — a builder can implement every task using only the plan file; no missing references or "figure it out" gaps
+- **Goal** — states what the plan achieves in one or two sentences
+- **Requirements** — every behavior, constraint, and acceptance criterion is explicit; assumptions are labelled as such
+- **Diagrams** — Target State present; Current State included whenever existing code is modified (Mermaid diagrams)
+- **Phase goals** — every phase in a multi-phase plan has its own high-level goal
+- **Interfaces** — all new/updated public interfaces/modules include full types and method signatures
+- **Tasks** — each is atomic, references exact files/symbols, has a test-first step and a verification command
+- **References** — every task names the interfaces/types it relies on so the builder needs nothing else
+
+If any check fails, revise before saving as APPROVED.
 
 ## Do / Don't
 
 - DO keep the plan as short as possible while retaining all information
 - DO break work into atomic, independently verifiable tasks
-- DO include exact file paths and function names
+- DO include exact file paths, function names, and interface signatures
 - DO specify test commands that can be run to verify each task
 - DO write tasks so a builder can complete them from the plan file alone
+- DO include every reference a task needs to avoid the builder searching the codebase
 - DON'T create vague tasks like "improve performance"
 - DON'T skip verification steps
+- DON'T leave interfaces unspecified when they introduce or change public surfaces
 
 ## Impact Assessment
 
