@@ -21,6 +21,7 @@ llm-agents-config/
 │   ├── opencode-config/
 │   ├── reviewing-code/
 │   ├── testing-code/
+│   ├── text-compress/
 │   ├── writing-code/
 │   └── writing-plans/
 ├── agents/                    # Per-tool agent definitions
