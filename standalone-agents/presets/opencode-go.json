@@ -1,0 +1,10 @@
+{
+  "$comment": "OpenCode Go preset, mirrored from oh-my-opencode-slim src/cli/providers.ts MODEL_MAPPINGS['opencode-go']. Apply with: ./setup.sh --preset opencode-go. Agents not listed follow the global model.",
+  "orchestrator": { "model": "opencode-go/minimax-m3", "variant": "thinking" },
+  "oracle": { "model": "opencode-go/qwen3.7-max", "variant": "max" },
+  "explorer": { "model": "opencode-go/deepseek-v4-flash", "variant": "high" },
+  "librarian": { "model": "opencode-go/deepseek-v4-flash", "variant": "high" },
+  "designer": { "model": "opencode-go/kimi-k2.7-code" },
+  "fixer": { "model": "opencode-go/deepseek-v4-flash", "variant": "high" },
+  "observer": { "model": "opencode-go/mimo-v2.5" }
+}

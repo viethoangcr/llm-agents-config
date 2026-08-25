@@ -1,0 +1,9 @@
+{
+  "$comment": "Z.ai Plan preset, mirrored from oh-my-opencode-slim src/cli/providers.ts MODEL_MAPPINGS['zai-plan']. Apply with: ./setup.sh --preset zai-plan. Agents not listed follow the global model.",
+  "orchestrator": { "model": "zai-coding-plan/glm-5", "variant": "max" },
+  "oracle": { "model": "zai-coding-plan/glm-5", "variant": "high" },
+  "librarian": { "model": "zai-coding-plan/glm-5", "variant": "low" },
+  "explorer": { "model": "zai-coding-plan/glm-5", "variant": "low" },
+  "designer": { "model": "zai-coding-plan/glm-5", "variant": "medium" },
+  "fixer": { "model": "zai-coding-plan/glm-5", "variant": "low" }
+}

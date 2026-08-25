@@ -1,0 +1,9 @@
+{
+  "$comment": "GitHub Copilot preset, mirrored from oh-my-opencode-slim src/cli/providers.ts MODEL_MAPPINGS.copilot. Apply with: ./setup.sh --preset copilot. Agents not listed follow the global model.",
+  "orchestrator": { "model": "github-copilot/claude-opus-4.6", "variant": "max" },
+  "oracle": { "model": "github-copilot/claude-opus-4.6", "variant": "high" },
+  "librarian": { "model": "github-copilot/grok-code-fast-1", "variant": "low" },
+  "explorer": { "model": "github-copilot/grok-code-fast-1", "variant": "low" },
+  "designer": { "model": "github-copilot/gemini-3.1-pro-preview", "variant": "medium" },
+  "fixer": { "model": "github-copilot/claude-sonnet-4.6", "variant": "low" }
+}

@@ -1,0 +1,9 @@
+{
+  "$comment": "Kimi preset, mirrored from oh-my-opencode-slim src/cli/providers.ts MODEL_MAPPINGS.kimi. Apply with: ./setup.sh --preset kimi. Agents not listed follow the global model.",
+  "orchestrator": { "model": "kimi-for-coding/k2p5", "variant": "max" },
+  "oracle": { "model": "kimi-for-coding/k2p5", "variant": "high" },
+  "librarian": { "model": "kimi-for-coding/k2p5", "variant": "low" },
+  "explorer": { "model": "kimi-for-coding/k2p5", "variant": "low" },
+  "designer": { "model": "kimi-for-coding/k2p5", "variant": "medium" },
+  "fixer": { "model": "kimi-for-coding/k2p5", "variant": "low" }
+}

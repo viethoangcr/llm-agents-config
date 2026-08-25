@@ -1,0 +1,9 @@
+{
+  "$comment": "OpenAI preset, mirrored from oh-my-opencode-slim src/cli/providers.ts MODEL_MAPPINGS.openai. Apply with: ./setup.sh --preset openai. Agents not listed follow the global model.",
+  "orchestrator": { "model": "openai/gpt-5.6-terra", "variant": "high" },
+  "oracle": { "model": "openai/gpt-5.6-sol", "variant": "high" },
+  "librarian": { "model": "openai/gpt-5.6-luna", "variant": "low" },
+  "explorer": { "model": "openai/gpt-5.6-luna", "variant": "low" },
+  "designer": { "model": "openai/gpt-5.6-luna", "variant": "medium" },
+  "fixer": { "model": "openai/gpt-5.6-luna", "variant": "high" }
+}
