@@ -82,13 +82,17 @@ Per-agent models can instead be set directly in each `.md`'s frontmatter
 ## Presets
 
 Bundled model presets under `presets/`, mirrored from the plugin's
-`src/cli/providers.ts` (`MODEL_MAPPINGS`). These are the exact per-agent
-model/variant mappings the plugin's installer generates.
+`src/cli/providers.ts` (`MODEL_MAPPINGS`) — except `opencode-go` and
+`anthropic-openai`. `opencode-go` was updated 2026-09: DeepSeek V4.1-Flash on
+the high-volume lanes, with GLM-5.3-Flash reserved for the frontend agent
+(designer) only. `anthropic-openai` is a new dual-provider preset (see below).
+Original plugin mappings are noted in each preset's `$comment`.
 
 | Preset | File | Agents |
 |--------|------|--------|
 | `openai` (default) | `presets/openai.json` | orchestrator, oracle, librarian, explorer, designer, fixer |
 | `hybrid` | `presets/hybrid.json` | OpenAI + OpenCode Go mix — see below |
+| `anthropic-openai` | `presets/anthropic-openai.json` | Anthropic + OpenAI mix, fable/astra excluded — see below |
 | `opencode-go` | `presets/opencode-go.json` | + observer (vision model) |
 | `kimi` | `presets/kimi.json` | the 6 core agents |
 | `copilot` | `presets/copilot.json` | the 6 core agents (github-copilot models) |
@@ -104,16 +108,37 @@ presets are single-provider; this mixes to use the strongest model per agent:
 | orchestrator | `openai/gpt-5.6-terra` (`high`) | multimodal + strongest reasoning/tool-calling |
 | oracle | `openai/gpt-5.6-sol` (`high`) | deepest reasoning for high-stakes review |
 | designer | `openai/gpt-5.6-luna` (`medium`) | needs vision (screenshots/renders) + taste |
-| librarian | `opencode-go/deepseek-v4-flash` (`high`) | long-context docs, cheap + fast |
-| explorer | `opencode-go/deepseek-v4-flash` (`high`) | high-volume, cheap + fast |
-| fixer | `opencode-go/deepseek-v4-flash` (`high`) | high-volume, cheap + fast |
+| librarian | `opencode-go/deepseek-v4.1-flash` (`high`) | long-context docs, cheap + fast |
+| explorer | `opencode-go/deepseek-v4.1-flash` (`high`) | high-volume, cheap + fast |
+| fixer | `opencode-go/deepseek-v4.1-flash` (`high`) | high-volume, cheap + fast |
 | observer | `opencode-go/mimo-v2.5` | vision isolation |
 
-The deciding factor: the orchestrator must be multimodal. OpenCode Go's
-`minimax-m3` is **not** multimodal, so a pure `opencode-go` setup forces all
-visual work through Observer; OpenAI `gpt-5.6-terra` handles images directly.
-You put OpenAI on the 3 reasoning/knowledge/vision agents and OpenCode Go on
-the 3 high-volume cost lanes.
+Rationale: OpenAI takes the three reasoning/taste lanes (orchestrator,
+oracle, designer); OpenCode Go takes the three high-volume cost lanes.
+Note this is a quality preference, not a capability gap anymore: since
+DeepSeek V4.1-Flash (native image input, Sept 2026) a pure `opencode-go`
+setup handles multimodal work without OpenAI.
+
+### Anthropic + OpenAI (`anthropic-openai`)
+
+For a machine with **both** Anthropic and OpenAI providers. Uses each family's
+flagships below the top tier — `claude-fable-5` and `gpt-6-astra` are excluded
+(both $10/$50). Claude drives the agentic/coding lanes; OpenAI covers the
+reasoning/vision/cost lanes:
+
+| Agent | Model | Why |
+|-------|-------|-----|
+| orchestrator | `anthropic/claude-opus-5` (`high`) | strongest agentic/multimodal driver |
+| oracle | `openai/gpt-5.6-sol` (`xhigh`) | deepest reasoning, independent family from the orchestrator |
+| designer | `openai/gpt-5.6-luna` (`medium`) | vision + taste, cheap |
+| explorer | `openai/gpt-5.6-luna` (`low`) | 1M ctx, cheapest lane |
+| librarian | `openai/gpt-5.6-luna` (`high`) | long-context docs research, image/pdf input |
+| fixer | `anthropic/claude-sonnet-5` (`high`) | workhorse coder, strong tool use |
+| observer | `anthropic/claude-haiku-4-5` | cheap vision isolation on the other family |
+
+Swap the orchestrator to `openai/gpt-5.6-terra` (`high`, $2/$12) or
+`anthropic/claude-sonnet-5` (`high`, $2/$10) if `opus-5` ($5/$25) is too
+expensive for the always-on lane.
 
 Apply a preset when installing:
 
@@ -130,8 +155,9 @@ preset and tweak individual agents. Agents outside a preset are untouched;
 to switch presets later, just re-run setup with a different `--preset`.
 
 Note: in the plugin, the `opencode-go` preset also enables the observer
-(`disabled_agents: []`). This standalone ships `observer.md` with
-`disable: true`, so to match, remove that line from the file after setup.
+(`disabled_agents: []`), and the `opencode-go`/`anthropic-openai` presets map
+it. This standalone ships `observer.md` with `disable: true`, so to use it,
+remove that line from the file after setup.
 
 ## What is NOT replicated
 

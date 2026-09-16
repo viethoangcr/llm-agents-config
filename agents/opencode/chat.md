@@ -16,7 +16,7 @@ permission:
   todowrite: deny
   lsp: deny
   doom_loop: deny
-model: opencode-go/deepseek-v4-flash
+model: opencode-go/deepseek-v4.1-flash
 variant: max
 ---
 

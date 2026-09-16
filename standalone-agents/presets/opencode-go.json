@@ -1,10 +1,10 @@
 {
-  "$comment": "OpenCode Go preset, mirrored from oh-my-opencode-slim src/cli/providers.ts MODEL_MAPPINGS['opencode-go']. Apply with: ./setup.sh --preset opencode-go. Agents not listed follow the global model.",
-  "orchestrator": { "model": "opencode-go/minimax-m3", "variant": "thinking" },
-  "oracle": { "model": "opencode-go/qwen3.7-max", "variant": "max" },
-  "explorer": { "model": "opencode-go/deepseek-v4-flash", "variant": "high" },
-  "librarian": { "model": "opencode-go/deepseek-v4-flash", "variant": "high" },
-  "designer": { "model": "opencode-go/kimi-k2.7-code" },
-  "fixer": { "model": "opencode-go/deepseek-v4-flash", "variant": "high" },
+  "$comment": "OpenCode Go preset. Updated 2026-09: DeepSeek V4.1-Flash (native image input, 1M ctx, $0.15/$0.60) on the high-volume lanes; GLM-5.3-Flash reserved for the frontend agent (designer) only. Oracle keeps glm-5.3 (non-flash); observer keeps mimo-v2.5 for vision isolation. No variant is set on GLM-5.3* because opencode only exposes GLM variants for glm-5.2 ids (blanket glm exclusion otherwise). The original plugin mapping used minimax-m3/qwen3.7-max/deepseek-v4-flash/kimi-k2.7-code. Apply with: ./setup.sh --preset opencode-go. Agents not listed follow the global model.",
+  "orchestrator": { "model": "opencode-go/deepseek-v4.1-flash", "variant": "high" },
+  "oracle": { "model": "opencode-go/glm-5.3" },
+  "explorer": { "model": "opencode-go/deepseek-v4.1-flash", "variant": "low" },
+  "librarian": { "model": "opencode-go/deepseek-v4.1-flash", "variant": "low" },
+  "designer": { "model": "opencode-go/glm-5.3-flash" },
+  "fixer": { "model": "opencode-go/deepseek-v4.1-flash", "variant": "high" },
   "observer": { "model": "opencode-go/mimo-v2.5" }
 }

@@ -93,14 +93,21 @@ data.setdefault("$schema", "https://opencode.ai/config.json")
 data["default_agent"] = "orchestrator"
 agents = data.setdefault("agent", {})
 
-def merge_models(models, source):
+def merge_models(models, source, replace=False):
     applied = 0
     for name, cfg in models.items():
         if not isinstance(cfg, dict):
             continue  # ignore non-agent keys like "$comment"
         merged = {k: v for k, v in cfg.items() if k in ("model", "variant", "temperature")}
         if merged:
-            agents.setdefault(name, {}).update(merged)
+            entry = agents.setdefault(name, {})
+            if replace:
+                # A preset fully defines the model mapping: drop keys the new
+                # preset no longer sets (e.g. a removed variant), so switching
+                # presets cannot leave stale values behind.
+                for k in ("model", "variant", "temperature"):
+                    entry.pop(k, None)
+            entry.update(merged)
             applied += 1
     if applied:
         print(f"merged per-agent models from {source}")
@@ -115,7 +122,7 @@ if preset:
         print(f"error: unknown preset '{preset}'. Available: {', '.join(available)}", file=sys.stderr)
         sys.exit(2)
     with open(preset_path, encoding="utf-8") as f:
-        merge_models(json.load(f), preset_path)
+        merge_models(json.load(f), preset_path, replace=True)
 
 # 2. Optional user models.json overrides on top of the preset.
 if os.path.exists(models_path):

@@ -7,7 +7,7 @@ description: 'Fast agent specialized for exploring codebases. Use this when you
   the desired thoroughness level: "quick" for basic searches, "medium" for
   moderate exploration, or "very thorough" for comprehensive analysis across
   multiple locations and naming conventions.'
-model: opencode-go/deepseek-v4-flash
+model: opencode-go/deepseek-v4.1-flash
 permission:
   "*": deny
   doom_loop: ask
@@ -71,7 +71,6 @@ permission:
   bash: allow
   webfetch: allow
   websearch: allow
-variant: high
 ---
 
 You are a file search specialist. You excel at thoroughly navigating and exploring codebases.
