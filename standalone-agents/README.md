@@ -123,22 +123,22 @@ setup handles multimodal work without OpenAI.
 
 For a machine with **both** Anthropic and OpenAI providers. Uses each family's
 flagships below the top tier — `claude-fable-5` and `gpt-6-astra` are excluded
-(both $10/$50). Claude drives the agentic/coding lanes; OpenAI covers the
-reasoning/vision/cost lanes:
+(both $10/$50). Claude drives orchestration and design; OpenAI covers the
+reasoning/implementation/vision/cost lanes:
 
 | Agent | Model | Why |
 |-------|-------|-----|
 | orchestrator | `anthropic/claude-opus-5` (`high`) | strongest agentic/multimodal driver |
 | oracle | `openai/gpt-5.6-sol` (`xhigh`) | deepest reasoning, independent family from the orchestrator |
-| designer | `openai/gpt-5.6-luna` (`medium`) | vision + taste, cheap |
+| designer | `anthropic/claude-opus-5` (`medium`) | design taste: Vibe Code Bench 88.4%, 3:48/prompt; low-volume lane, so the premium is fine |
 | explorer | `openai/gpt-5.6-luna` (`low`) | 1M ctx, cheapest lane |
 | librarian | `openai/gpt-5.6-luna` (`high`) | long-context docs research, image/pdf input |
-| fixer | `anthropic/claude-sonnet-5` (`high`) | workhorse coder, strong tool use |
-| observer | `anthropic/claude-haiku-4-5` | cheap vision isolation on the other family |
+| fixer | `openai/gpt-5.6-terra` (`medium`) | near-flagship quality at the fastest per-prompt time (49.2 pts @ $0.20, 2:44 real-world) |
+| observer | `openai/gpt-5.6-terra` (`medium`) | best vision of the three (MMMU-Pro 80.7%, gdp.pdf 24.7%); low-volume agent, so cost is moot |
 
-Swap the orchestrator to `openai/gpt-5.6-terra` (`high`, $2/$12) or
-`anthropic/claude-sonnet-5` (`high`, $2/$10) if `opus-5` ($5/$25) is too
-expensive for the always-on lane.
+Swap the orchestrator to `openai/gpt-5.6-terra` (`medium`, fastest) or
+`openai/gpt-5.6-luna` (`max`, cheapest but slowest) if `opus-5` ($5/$25) is
+too expensive or slow for the always-on lane.
 
 Apply a preset when installing:
 

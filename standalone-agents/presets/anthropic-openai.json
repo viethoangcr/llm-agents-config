@@ -1,10 +1,10 @@
 {
-  "$comment": "Anthropic + OpenAI preset (fable and astra excluded). Claude takes the agentic/coding lanes (orchestrator, fixer, observer); OpenAI takes the reasoning/vision/cost lanes (oracle, designer, explorer, librarian). Apply with: ./setup.sh --preset anthropic-openai. Agents not listed follow the global model.",
+  "$comment": "Anthropic + OpenAI preset (fable and astra excluded). Claude drives orchestration and design; OpenAI covers the reasoning/implementation/vision/cost lanes (oracle, explorer, librarian, fixer, observer). Fixer is gpt-5.6-terra medium: near-flagship code quality at the fastest per-prompt time, where high-effort models are too slow. Apply with: ./setup.sh --preset anthropic-openai. Agents not listed follow the global model.",
   "orchestrator": { "model": "anthropic/claude-opus-5", "variant": "high" },
   "oracle": { "model": "openai/gpt-5.6-sol", "variant": "xhigh" },
-  "designer": { "model": "openai/gpt-5.6-luna", "variant": "medium" },
+  "designer": { "model": "anthropic/claude-opus-5", "variant": "medium" },
   "explorer": { "model": "openai/gpt-5.6-luna", "variant": "low" },
   "librarian": { "model": "openai/gpt-5.6-luna", "variant": "high" },
-  "fixer": { "model": "anthropic/claude-sonnet-5", "variant": "high" },
-  "observer": { "model": "anthropic/claude-haiku-4-5" }
+  "fixer": { "model": "openai/gpt-5.6-terra", "variant": "medium" },
+  "observer": { "model": "openai/gpt-5.6-terra", "variant": "medium" }
 }
