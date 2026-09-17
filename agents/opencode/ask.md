@@ -39,8 +39,7 @@ permission:
   task: deny
   todowrite: deny
   doom_loop: deny
-model: opencode-go/deepseek-v4-flash
-variant: max
+model: opencode-go/deepseek-v4.1-flash
 ---
 
 You are an ask mode agent. Your purpose is to answer questions about the codebase
