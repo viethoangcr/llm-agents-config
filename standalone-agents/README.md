@@ -87,7 +87,10 @@ Bundled model presets under `presets/`, mirrored from the plugin's
 `anthropic-openai`. `opencode-go` was updated 2026-09: DeepSeek V4.1-Flash on
 the high-volume lanes, with GLM-5.3-Flash reserved for the frontend agent
 (designer) only. `anthropic-openai` is a new dual-provider preset (see below).
-Original plugin mappings are noted in each preset's `$comment`.
+The `openai`, `hybrid`, and `anthropic-openai` presets were refreshed
+2026-09-22 for Claude Opus 5.5 and the GPT-6 family (`sol` reasoning,
+`luna` cost/vision). Original plugin mappings are noted in each preset's
+`$comment`.
 
 | Preset | File | Agents |
 |--------|------|--------|
@@ -106,9 +109,9 @@ presets are single-provider; this mixes to use the strongest model per agent:
 
 | Agent | Model | Why |
 |-------|-------|-----|
-| orchestrator | `openai/gpt-5.6-terra` (`high`) | multimodal + strongest reasoning/tool-calling |
-| oracle | `openai/gpt-5.6-sol` (`high`) | deepest reasoning for high-stakes review |
-| designer | `openai/gpt-5.6-luna` (`medium`) | needs vision (screenshots/renders) + taste |
+| orchestrator | `openai/gpt-6-sol` (`high`) | newest reasoning tier; vision + tool-calling at $2/$10 |
+| oracle | `openai/gpt-6-sol` (`xhigh`) | deepest reasoning for high-stakes review |
+| designer | `openai/gpt-6-luna` (`medium`) | needs vision (screenshots/renders) + taste |
 | librarian | `opencode-go/deepseek-v4.1-flash` (`high`) | long-context docs, cheap + fast |
 | explorer | `opencode-go/deepseek-v4.1-flash` (`high`) | high-volume, cheap + fast |
 | fixer | `opencode-go/deepseek-v4.1-flash` (`high`) | high-volume, cheap + fast |
@@ -116,6 +119,8 @@ presets are single-provider; this mixes to use the strongest model per agent:
 
 Rationale: OpenAI takes the three reasoning/taste lanes (orchestrator,
 oracle, designer); OpenCode Go takes the three high-volume cost lanes.
+GPT-6 `sol`/`luna` replace the GPT-5.6 generations at the same or lower
+price (sol $2/$10, luna $0.10/$0.50) with 1.05M context and image/PDF input.
 Note this is a quality preference, not a capability gap anymore: since
 DeepSeek V4.1-Flash (native image input, Sept 2026) a pure `opencode-go`
 setup handles multimodal work without OpenAI.
@@ -123,22 +128,22 @@ setup handles multimodal work without OpenAI.
 ### Anthropic + OpenAI (`anthropic-openai`)
 
 For a machine with **both** Anthropic and OpenAI providers. Uses each family's
-flagships below the top tier — `claude-fable-5` and `gpt-6-astra` are excluded
+flagships below the top tier — `claude-fable-5-1` and `gpt-6-astra` are excluded
 (both $10/$50). Claude drives orchestration and design; OpenAI covers the
 reasoning/implementation/vision/cost lanes:
 
 | Agent | Model | Why |
 |-------|-------|-----|
-| orchestrator | `anthropic/claude-opus-5` (`high`) | strongest agentic/multimodal driver |
-| oracle | `openai/gpt-5.6-sol` (`xhigh`) | deepest reasoning, independent family from the orchestrator |
-| designer | `anthropic/claude-opus-5` (`medium`) | design taste: Vibe Code Bench 88.4%, 3:48/prompt; low-volume lane, so the premium is fine |
-| explorer | `openai/gpt-5.6-luna` (`low`) | 1M ctx, cheapest lane |
-| librarian | `openai/gpt-5.6-luna` (`high`) | long-context docs research, image/pdf input |
-| fixer | `openai/gpt-5.6-terra` (`medium`) | near-flagship quality at the fastest per-prompt time (49.2 pts @ $0.20, 2:44 real-world) |
-| observer | `openai/gpt-5.6-terra` (`medium`) | best vision of the three (MMMU-Pro 80.7%, gdp.pdf 24.7%); low-volume agent, so cost is moot |
+| orchestrator | `anthropic/claude-opus-5-5` (`high`) | newest Opus: 1M ctx, image/PDF, cheaper than Opus 5 ($4/$20 vs $5/$25) |
+| oracle | `openai/gpt-6-sol` (`xhigh`) | deepest reasoning, independent family from the orchestrator |
+| designer | `anthropic/claude-opus-5-5` (`medium`) | design taste on the newest Opus; low-volume lane |
+| explorer | `openai/gpt-6-luna` (`low`) | 1.05M ctx, cheapest lane ($0.10/$0.50) |
+| librarian | `openai/gpt-6-luna` (`high`) | long-context docs research, image/PDF input |
+| fixer | `openai/gpt-6-sol` (`medium`) | latest-generation mid-tier; lower effort than the oracle for the implementation lane |
+| observer | `openai/gpt-6-sol` (`medium`) | image/PDF vision; low-volume agent, so cost is moot |
 
-Swap the orchestrator to `openai/gpt-5.6-terra` (`medium`, fastest) or
-`openai/gpt-5.6-luna` (`max`, cheapest but slowest) if `opus-5` ($5/$25) is
+Swap the orchestrator to `openai/gpt-6-sol` (`medium`) or
+`openai/gpt-6-luna` (`max`, cheapest) if `opus-5-5` ($4/$20) is
 too expensive or slow for the always-on lane.
 
 Apply a preset when installing:
