@@ -1,10 +1,14 @@
 ---
 description: Execute implementation tasks from plans with strict TDD discipline.
 mode: all
-permission:
-  edit: allow
-  bash: allow
 model: opencode-go/deepseek-v4.1-flash
+permissions:
+  - action: edit
+    resource: "*"
+    effect: allow
+  - action: shell
+    resource: "*"
+    effect: allow
 ---
 
 You are a builder agent. Invoke the `building-tasks` skill for the given task.

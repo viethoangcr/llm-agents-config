@@ -2,44 +2,89 @@
 description: Answers questions about the codebase, explains code, and provides
   analysis without making any changes.
 mode: primary
-permission:
-  read: allow
-  glob: allow
-  grep: allow
-  list: allow
-  edit: deny
-  bash:
-    "*": ask
-    pwd: allow
-    ls: allow
-    ls *: allow
-    cat *: allow
-    which *: allow
-    git status: allow
-    git status *: allow
-    git diff: allow
-    git diff *: allow
-    git log: allow
-    git log *: allow
-    git show: allow
-    git show *: allow
-    git rev-parse: allow
-    git rev-parse *: allow
-    git branch --show-current: allow
-    git remote -v: allow
-    grep *: allow
-    go list*: allow
-    npm list: allow
-    npm list*: allow
-    cargo metadata: allow
-    cargo metadata *: allow
-  webfetch: allow
-  websearch: allow
-  question: allow
-  task: deny
-  todowrite: deny
-  doom_loop: deny
 model: opencode-go/deepseek-v4.1-flash
+permissions:
+  - action: read
+    resource: "*"
+    effect: allow
+  - action: shell
+    resource: "*"
+    effect: ask
+  - action: shell
+    resource: pwd
+    effect: allow
+  - action: shell
+    resource: ls
+    effect: allow
+  - action: shell
+    resource: "ls *"
+    effect: allow
+  - action: shell
+    resource: "cat *"
+    effect: allow
+  - action: shell
+    resource: "which *"
+    effect: allow
+  - action: shell
+    resource: "git status"
+    effect: allow
+  - action: shell
+    resource: "git status *"
+    effect: allow
+  - action: shell
+    resource: "git diff"
+    effect: allow
+  - action: shell
+    resource: "git diff *"
+    effect: allow
+  - action: shell
+    resource: "git log"
+    effect: allow
+  - action: shell
+    resource: "git log *"
+    effect: allow
+  - action: shell
+    resource: "git show"
+    effect: allow
+  - action: shell
+    resource: "git show *"
+    effect: allow
+  - action: shell
+    resource: "git rev-parse"
+    effect: allow
+  - action: shell
+    resource: "git rev-parse *"
+    effect: allow
+  - action: shell
+    resource: "git branch --show-current"
+    effect: allow
+  - action: shell
+    resource: "git remote -v"
+    effect: allow
+  - action: shell
+    resource: "grep *"
+    effect: allow
+  - action: shell
+    resource: "go list*"
+    effect: allow
+  - action: shell
+    resource: "npm list"
+    effect: allow
+  - action: shell
+    resource: "npm list*"
+    effect: allow
+  - action: shell
+    resource: "cargo metadata"
+    effect: allow
+  - action: shell
+    resource: "cargo metadata *"
+    effect: allow
+  - action: edit
+    resource: "*"
+    effect: deny
+  - action: subagent
+    resource: "*"
+    effect: deny
 ---
 
 You are an ask mode agent. Your purpose is to answer questions about the codebase

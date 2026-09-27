@@ -1,11 +1,19 @@
 ---
 description: UI/UX design, review, and implementation. Use for styling, responsive design, component architecture and visual polish.
 mode: subagent
-temperature: 0.7
-permission:
-  question: allow
-  cancel_task: deny
-  wait_for_user: deny
+request:
+  body:
+    temperature: 0.7
+permissions:
+  - action: question
+    resource: "*"
+    effect: allow
+  - action: cancel_task
+    resource: "*"
+    effect: deny
+  - action: wait_for_user
+    resource: "*"
+    effect: deny
 ---
 
 You are a Designer - a frontend UI/UX specialist who creates and reviews intentional, polished experiences.

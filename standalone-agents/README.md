@@ -3,7 +3,7 @@
 Replicates the agent **specifications** from the `oh-my-opencode-slim` plugin
 using only official OpenCode agent definitions (`.md` files with frontmatter,
 per https://opencode.ai). No plugin is installed — you get the same prompts,
-roles, temperatures, and permission objects as `src/agents/*.ts`.
+roles, temperatures, and permissions as `src/agents/*.ts`.
 
 ## Agents
 
@@ -22,12 +22,12 @@ roles, temperatures, and permission objects as `src/agents/*.ts`.
 Notes on fidelity vs the plugin:
 - Every agent omits `model`, matching the plugin's default (`model: undefined`
   → agents follow the global/session model).
-- Permissions replicate `applyDefaultPermissions()` (`question: allow` on all;
+- Permissions use the V2 `permissions` rule array (`question: allow` on all;
   `cancel_task`/`wait_for_user` only on the orchestrator) plus the strict
   read-only allowlist on `councillor` and the deny-all on `council`.
 - Every subagent prompt carries the task-rejection suffix
   ("If a task is outside your role...").
-- `observer.md` sets `disable: true` to match `DEFAULT_DISABLED_AGENTS`;
+- `observer.md` sets `disabled: true` to match `DEFAULT_DISABLED_AGENTS`;
   remove it to enable.
 - The orchestrator prompt is a **static snapshot** of `buildOrchestratorPrompt()`
   with all specialists enabled.
@@ -35,15 +35,15 @@ Notes on fidelity vs the plugin:
 ## Setup
 
 ```bash
-./setup.sh            # install to ~/.config/opencode/agent (global)
-./setup.sh project    # install to ./.opencode/agent (this project)
+./setup.sh            # install to ~/.config/opencode/agents (global)
+./setup.sh project    # install to ./.opencode/agents (this project)
 ```
 
 The script copies the `.md` files to the target agent directory and sets
 `"default_agent": "orchestrator"` in the corresponding `opencode.json`
 (preserving existing keys). Then **quit and restart opencode**.
 
-To enable librarian's `context7` / `gh_grep`, uncomment and fill the `mcp`
+To enable librarian's `context7` / `gh_grep`, uncomment and fill the `mcp.servers`
 block at the bottom of `setup.sh` (or add them to your own `opencode.json`).
 
 ## Models
@@ -69,12 +69,13 @@ cp models.json.example models.json
 }
 ```
 
-Setup merges these into `opencode.json` under `agent.<name>.model` (and
-`.variant`). Suggestions per role are annotated in `models.json.example`
-(e.g. cheap/fast models for `explorer`/`fixer`, vision model required for
-`observer`, strongest reasoning for `oracle`). Override any subset — agents
-not listed keep following the global model. You can also point setup at a
-different file with `MODELS_FILE=/path/to/models.json`.
+Setup merges these into `opencode.json` under `agents.<name>.model` (joining
+`model` and `variant` as `provider/model#variant`, and writing `temperature` to
+`agents.<name>.request.body.temperature`). Suggestions per role are annotated in
+`models.json.example` (e.g. cheap/fast models for `explorer`/`fixer`, vision
+model required for `observer`, strongest reasoning for `oracle`). Override any
+subset — agents not listed keep following the global model. You can also point
+setup at a different file with `MODELS_FILE=/path/to/models.json`.
 
 Per-agent models can instead be set directly in each `.md`'s frontmatter
 (`model: provider/model-id`), or globally in `opencode.json` (`"model": ...`).
@@ -86,7 +87,11 @@ Bundled model presets under `presets/`, mirrored from the plugin's
 `anthropic-openai`. `opencode-go` was updated 2026-09: DeepSeek V4.1-Flash on
 the high-volume lanes, with GLM-5.3-Flash reserved for the frontend agent
 (designer) only. `anthropic-openai` is a new dual-provider preset (see below).
-Original plugin mappings are noted in each preset's `$comment`.
+The `openai`, `hybrid`, and `anthropic-openai` presets were refreshed
+2026-09-22 for Claude Opus 5.5 and the GPT-6 family (`sol` reasoning,
+`luna` cost/vision). `gpt-6-luna` is never used below `medium`: `medium` for
+simple read/summarize lanes, `high`/`xhigh` for more complex ones. Original
+plugin mappings are noted in each preset's `$comment`.
 
 | Preset | File | Agents |
 |--------|------|--------|
@@ -105,9 +110,9 @@ presets are single-provider; this mixes to use the strongest model per agent:
 
 | Agent | Model | Why |
 |-------|-------|-----|
-| orchestrator | `openai/gpt-5.6-terra` (`high`) | multimodal + strongest reasoning/tool-calling |
-| oracle | `openai/gpt-5.6-sol` (`high`) | deepest reasoning for high-stakes review |
-| designer | `openai/gpt-5.6-luna` (`medium`) | needs vision (screenshots/renders) + taste |
+| orchestrator | `openai/gpt-6-sol` (`high`) | newest reasoning tier; vision + tool-calling at $2/$10 |
+| oracle | `openai/gpt-6-sol` (`xhigh`) | deepest reasoning for high-stakes review |
+| designer | `openai/gpt-6-luna` (`medium`) | needs vision (screenshots/renders) + taste |
 | librarian | `opencode-go/deepseek-v4.1-flash` (`high`) | long-context docs, cheap + fast |
 | explorer | `opencode-go/deepseek-v4.1-flash` (`high`) | high-volume, cheap + fast |
 | fixer | `opencode-go/deepseek-v4.1-flash` (`high`) | high-volume, cheap + fast |
@@ -115,6 +120,8 @@ presets are single-provider; this mixes to use the strongest model per agent:
 
 Rationale: OpenAI takes the three reasoning/taste lanes (orchestrator,
 oracle, designer); OpenCode Go takes the three high-volume cost lanes.
+GPT-6 `sol`/`luna` replace the GPT-5.6 generations at the same or lower
+price (sol $2/$10, luna $0.10/$0.50) with 1.05M context and image/PDF input.
 Note this is a quality preference, not a capability gap anymore: since
 DeepSeek V4.1-Flash (native image input, Sept 2026) a pure `opencode-go`
 setup handles multimodal work without OpenAI.
@@ -122,22 +129,22 @@ setup handles multimodal work without OpenAI.
 ### Anthropic + OpenAI (`anthropic-openai`)
 
 For a machine with **both** Anthropic and OpenAI providers. Uses each family's
-flagships below the top tier — `claude-fable-5` and `gpt-6-astra` are excluded
+flagships below the top tier — `claude-fable-5-1` and `gpt-6-astra` are excluded
 (both $10/$50). Claude drives orchestration and design; OpenAI covers the
 reasoning/implementation/vision/cost lanes:
 
 | Agent | Model | Why |
 |-------|-------|-----|
-| orchestrator | `anthropic/claude-opus-5` (`high`) | strongest agentic/multimodal driver |
-| oracle | `openai/gpt-5.6-sol` (`xhigh`) | deepest reasoning, independent family from the orchestrator |
-| designer | `anthropic/claude-opus-5` (`medium`) | design taste: Vibe Code Bench 88.4%, 3:48/prompt; low-volume lane, so the premium is fine |
-| explorer | `openai/gpt-5.6-luna` (`low`) | 1M ctx, cheapest lane |
-| librarian | `openai/gpt-5.6-luna` (`high`) | long-context docs research, image/pdf input |
-| fixer | `openai/gpt-5.6-terra` (`medium`) | near-flagship quality at the fastest per-prompt time (49.2 pts @ $0.20, 2:44 real-world) |
-| observer | `openai/gpt-5.6-terra` (`medium`) | best vision of the three (MMMU-Pro 80.7%, gdp.pdf 24.7%); low-volume agent, so cost is moot |
+| orchestrator | `anthropic/claude-opus-5-5` (`high`) | newest Opus: 1M ctx, image/PDF, cheaper than Opus 5 ($4/$20 vs $5/$25) |
+| oracle | `openai/gpt-6-sol` (`xhigh`) | deepest reasoning, independent family from the orchestrator |
+| designer | `anthropic/claude-opus-5-5` (`medium`) | design taste on the newest Opus; low-volume lane |
+| explorer | `openai/gpt-6-luna` (`medium`) | 1.05M ctx, cheapest lane ($0.10/$0.50) |
+| librarian | `openai/gpt-6-luna` (`high`) | long-context docs research, image/PDF input |
+| fixer | `openai/gpt-6-sol` (`medium`) | latest-generation mid-tier; lower effort than the oracle for the implementation lane |
+| observer | `openai/gpt-6-sol` (`medium`) | image/PDF vision; low-volume agent, so cost is moot |
 
-Swap the orchestrator to `openai/gpt-5.6-terra` (`medium`, fastest) or
-`openai/gpt-5.6-luna` (`max`, cheapest but slowest) if `opus-5` ($5/$25) is
+Swap the orchestrator to `openai/gpt-6-sol` (`medium`) or
+`openai/gpt-6-luna` (`max`, cheapest) if `opus-5-5` ($4/$20) is
 too expensive or slow for the always-on lane.
 
 Apply a preset when installing:
@@ -148,15 +155,16 @@ Apply a preset when installing:
 ```
 
 OpenCode has no native "preset" concept, so setup translates a preset into
-`opencode.json` by setting `agent.<name>.model`/`.variant` for each listed
-agent (agents not in the preset follow the global model). A `models.json`
-in this directory is applied on top of the preset, so you can start from a
-preset and tweak individual agents. Agents outside a preset are untouched;
-to switch presets later, just re-run setup with a different `--preset`.
+`opencode.json` by setting `agents.<name>.model` to `provider/model#variant`
+for each listed agent (agents not in the preset follow the global model). A
+`models.json` in this directory is applied on top of the preset, so you can
+start from a preset and tweak individual agents. Agents outside a preset are
+untouched; to switch presets later, just re-run setup with a different
+`--preset`.
 
 Note: in the plugin, the `opencode-go` preset also enables the observer
 (`disabled_agents: []`), and the `opencode-go`/`anthropic-openai` presets map
-it. This standalone ships `observer.md` with `disable: true`, so to use it,
+it. This standalone ships `observer.md` with `disabled: true`, so to use it,
 remove that line from the file after setup.
 
 ## What is NOT replicated

@@ -57,21 +57,18 @@ This creates symlinks from each tool's config directory to the central repo:
 | Claude Code | `~/.claude/skills/<name>` → `skills/<name>` | `~/.claude/CLAUDE.md` with `@import` | `config/claude-settings.json` (copy) | `agents/claude/*.md` → `~/.claude/agents/` | — |
 | Codex | `~/.agents/skills/<name>` → `skills/<name>` | `~/.codex/AGENTS.md` → `context/AGENTS.md` | `config/codex-config.toml` (copy + edit paths) | `agents/codex/*.{toml,md}` → `~/.codex/agents/` | — |
 
-For OpenCode, `setup.sh` also verifies that `ask (primary)` and `chat (primary)` are discoverable when the `opencode` CLI is installed.
+For OpenCode, `setup.sh` also verifies that `ask` and `chat` are discoverable when the `opencode` CLI is installed.
 
 ### Per-project setup
 
 For each project, either:
 
-1. **Symlink AGENTS.md**:
+1. **Symlink AGENTS.md** (preferred — OpenCode V2 only discovers `AGENTS.md`):
    ```bash
    ln -sf ~/Workspace/personal/llm-agents-config/context/AGENTS.md /path/to/project/AGENTS.md
    ```
 
-2. **Or reference in `opencode.json`**:
-   ```json
-   { "instructions": ["~/Workspace/personal/llm-agents-config/context/AGENTS.md"] }
-   ```
+2. **Or copy the content** into the project's `AGENTS.md`.
 
 ## How it works
 
@@ -99,7 +96,7 @@ MCP server configs are stored as reference templates in `mcp/`. Each tool uses a
 
 | Tool | Config file | Template |
 |---|---|---|
-| OpenCode | `~/.config/opencode/opencode.json` → `mcp` section | `mcp/opencode.json` |
+| OpenCode | `~/.config/opencode/opencode.json` → `mcp.servers` section | `mcp/opencode.json` |
 | Claude Code | `.mcp.json` or `~/.claude.json` | `mcp/claude.json` |
 | Codex | `~/.codex/config.toml` → `[mcp]` sections | `mcp/codex.toml` |
 

@@ -1,11 +1,19 @@
 ---
 description: AI coding orchestrator that delegates tasks to specialist agents for optimal quality, speed, and cost
 mode: primary
-temperature: 0.1
-permission:
-  question: allow
-  cancel_task: allow
-  wait_for_user: allow
+request:
+  body:
+    temperature: 0.1
+permissions:
+  - action: question
+    resource: "*"
+    effect: allow
+  - action: cancel_task
+    resource: "*"
+    effect: allow
+  - action: wait_for_user
+    resource: "*"
+    effect: allow
 ---
 
 <Role>

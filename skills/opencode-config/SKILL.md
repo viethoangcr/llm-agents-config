@@ -1,85 +1,99 @@
 ---
 name: opencode-config
 description: >
-  Guides modifications to OpenCode agent configuration. Use this skill when:
-  (1) editing opencode.json or tui.json settings,
+  Guides modifications to OpenCode V2 agent configuration. Use this skill when:
+  (1) editing opencode.json or cli.json settings,
   (2) creating or updating agent definitions (.md files in agents/opencode/),
   (3) creating or updating skills (skills/*/SKILL.md),
-  (4) creating or updating custom commands (.opencode/commands/ or opencode.json command entries),
+  (4) creating or updating custom commands (.opencode/commands/ or opencode.json commands entries),
   (5) adding or modifying MCP server configs,
-  (6) creating or updating custom tools (.opencode/tools/),
+  (6) creating or updating plugins (.opencode/plugins/),
   (7) updating AGENTS.md project rules.
-  Each section includes a link to the official OpenCode docs for the latest reference.
+  Each section includes a link to the official OpenCode V2 docs for the latest reference.
 license: MIT
 compatibility: opencode
 metadata:
-  version: "1.0.0"
+  version: "2.0.0"
 ---
 
-# OpenCode Configuration
+# OpenCode Configuration (V2)
 
-This skill helps you manage OpenCode configuration — config files, agents, skills, commands, MCP servers, custom tools, and project rules.
+This skill helps you manage OpenCode V2 configuration — config files, agents, skills, commands, MCP servers, plugins, and project rules.
 
-## Config (`opencode.json` / `tui.json`)
+## Config (`opencode.json` / `cli.json`)
 
-**Docs:** https://opencode.ai/docs/config/
+**Docs:** https://opencode.ai/v2/docs/config/
 
-The main config file uses JSON or JSONC format. Multiple config files are merged (not replaced) in this precedence order (later wins):
+The main config file uses JSON or JSONC. Locations (later wins):
 
-1. Remote config (`.well-known/opencode`) — organizational defaults
-2. Global config (`~/.config/opencode/opencode.json`) — user preferences
-3. Custom config (`OPENCODE_CONFIG` env var)
-4. Project config (`opencode.json` in project root)
-5. `.opencode` directories — agents, commands, plugins
-6. Inline config (`OPENCODE_CONFIG_CONTENT` env var)
-7. Managed config files (admin-enforced, highest priority)
+1. Global config (`~/.config/opencode/opencode.json(c)`) — user preferences
+2. Project config (`<project>/opencode.json(c)`) — outermost to innermost
+3. `.opencode/opencode.json(c)` — every discovered `.opencode` config overrides every direct config
+4. `OPENCODE_CONFIG_CONTENT` env var
 
-Key schema sections: `provider`, `model`, `small_model`, `server`, `shell`, `tools`, `permission`, `agent`, `command`, `mcp`, `plugin`, `formatter`, `lsp`, `instructions`, `disabled_providers`, `enabled_providers`, `compaction`, `watcher`, `share`, `autoupdate`, `snapshot`.
+Include the schema for editor validation:
 
-TUI settings (theme, keymap, scroll_speed, mouse, diff_style) go in a separate `tui.json` or `tui.jsonc`.
+```jsonc
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "anthropic/claude-sonnet-4-5",
+}
+```
 
-Use `{env:VARIABLE_NAME}` for env vars and `{file:path/to/file}` for file contents in config values.
+Key top-level fields: `model`, `default_agent`, `permissions`, `agents`, `commands`, `providers`, `mcp`, `skills`, `plugins`, `references`, `formatter`, `lsp`, `compaction`, `watcher`, `share`, `update`, `snapshots`, `media`, `tool_output`, `experimental.policies`.
 
-**Schema URLs:** https://opencode.ai/config.json and https://opencode.ai/tui.json
+Use `{env:VARIABLE_NAME}` for env vars in config values.
+
+Terminal/CLI preferences (theme, keybinds, diffs, session UI) live in the separate global `~/.config/opencode/cli.json`, not in `opencode.json`.
+
+**CLI docs:** https://opencode.ai/v2/docs/cli/config/ | **Schema:** https://opencode.ai/v2/cli.json
 
 ## Agents
 
-**Docs:** https://opencode.ai/docs/agents/
+**Docs:** https://opencode.ai/v2/docs/agents/
 
-Agents are specialized AI assistants with custom prompts, models, and tool access. Two types:
+Agents are specialized AI assistants with custom prompts, models, and permissions. Two types:
 
-- **Primary agents** — main assistants cycled via Tab key (e.g., Build, Plan)
+- **Primary agents** — main assistants cycled with Shift+Tab (e.g., Build, Plan)
 - **Subagents** — invoked by primary agents or via @mention (e.g., General, Explore)
 
-Define agents in `opencode.json` under `agent` key, or as markdown files in:
+Define agents in `opencode.json` under the `agents` key, or as markdown files in:
 - Global: `~/.config/opencode/agents/`
 - Per-project: `.opencode/agents/`
 
-**Markdown agent format:**
+Legacy `agent/`, `mode/`, and `modes/` directories are still discovered, but use `agents/` for new files.
+
+**Markdown agent format (native V2):**
 ```yaml
 ---
 description: What this agent does
 mode: primary|subagent|all
-model: provider/model-id
-temperature: 0.1
-permission:
-  edit: deny
-  bash:
-    "*": ask
-    "git diff": allow
-  skill:
-    "my-skill": allow
-color: "#ff6b6b"
+model: provider/model-id#variant
+hidden: false
+disabled: false
 steps: 10
+color: "#ff6b6b"
+request:
+  body:
+    temperature: 0.1
+permissions:
+  - action: edit
+    resource: "*"
+    effect: deny
+  - action: shell
+    resource: "*"
+    effect: ask
 ---
 System prompt content here...
 ```
 
-The filename becomes the agent name (e.g., `review.md` creates `review`).
+The filename becomes the agent name (e.g., `review.md` creates `review`). The Markdown body is the agent's `system` prompt. Do not use legacy fields such as `temperature` (top level), `prompt`, `permission`, `tools`, `disable`, or `maxSteps`.
 
-Permissions keys: `read`, `edit` (covers write/edit/apply_patch), `glob`, `grep`, `list`, `bash`, `task`, `todowrite`, `webfetch`, `websearch`, `lsp`, `skill`, `question`, `doom_loop`, `external_directory`. Values: `"allow"`, `"ask"`, `"deny"`.
+Note: V2 currently preserves `request.settings`, `request.headers`, and `request.body` but does not send them with model requests yet. Configure active request settings on the provider, model, or model variant instead.
 
-Use `opencode agent create` for interactive agent creation.
+Permission actions: `read`, `edit`, `glob`, `grep`, `shell`, `subagent`, `skill`, `question`, `webfetch`, `websearch`, `external_directory`, `<server>_<tool>` for MCP tools, and plugin-defined strings. Values: `allow`, `ask`, `deny`.
+
+JSON configuration uses the same fields under `agents.<id>`, with `system` instead of the body.
 
 ### Agent File Locations in This Repo
 
@@ -87,9 +101,9 @@ Agent definitions live in `agents/opencode/` and are symlinked to `~/.config/ope
 
 ## Skills
 
-**Docs:** https://opencode.ai/docs/skills/
+**Docs:** https://opencode.ai/v2/docs/skills/
 
-Skills are reusable SKILL.md definitions loaded on-demand via the `skill` tool. Place them in:
+Skills are reusable `SKILL.md` definitions loaded on-demand via the `skill` tool. Place them in:
 
 - Project: `.opencode/skills/<name>/SKILL.md`
 - Global: `~/.config/opencode/skills/<name>/SKILL.md`
@@ -98,20 +112,21 @@ Skills are reusable SKILL.md definitions loaded on-demand via the `skill` tool. 
 **SKILL.md format:**
 ```yaml
 ---
-name: skill-name           # lowercase, hyphens only, 1-64 chars, must match dir name
-description: >             # 1-1024 chars, include trigger conditions
+name: Skill Display Name     # optional display label; the path-derived ID is the skill ID
+description: >               # required for the model to discover the skill
   What this skill does and when to use it.
-license: MIT               # optional
-compatibility: opencode    # optional
-metadata:                  # optional, string-to-string map
-  version: "1.0.0"
+slash: true                  # optional; false hides it from interactive catalogs
+metadata:
+  opencode/autoinvoke: false # optional; false hides it from the model's available list
 ---
 Markdown body with instructions...
 ```
 
-Name regex: `^[a-z0-9]+(-[a-z0-9]+)*$`
+Skill IDs are path-derived, exact, and case-sensitive: `skills/git-release/SKILL.md` has the ID `git-release`. Add extra sources with the `skills` array in config:
 
-Control skill access via permissions: `"permission": { "skill": { "*": "allow", "internal-*": "deny" } }`
+```jsonc
+{ "skills": ["./team-skills", "https://example.com/opencode/skills/"] }
+```
 
 ### Skill File Locations in This Repo
 
@@ -119,43 +134,45 @@ Skills live in `skills/<name>/SKILL.md` as the single source of truth. They are 
 
 ## Commands
 
-**Docs:** https://opencode.ai/docs/commands/
+**Docs:** https://opencode.ai/v2/docs/commands/
 
-Custom slash commands for repetitive tasks. Define in `opencode.json` under `command` key, or as markdown files in:
+Custom slash commands for repetitive tasks. Define in `opencode.json` under the `commands` key, or as markdown files in:
 - Global: `~/.config/opencode/commands/`
 - Per-project: `.opencode/commands/`
+
+The legacy `command/` directory is still discovered, but use `commands/` for new files.
 
 **Markdown command format:**
 ```yaml
 ---
 description: Run tests with coverage
 agent: build
-model: anthropic/claude-sonnet-4-5
-subtask: true
+model: anthropic/claude-sonnet-4-5#high
+subagent: true
 ---
+
 Prompt template content here. Use $ARGUMENTS, $1, $2 etc. for args.
 Use !`command` to inject shell output.
-Use @filename to include file contents.
 ```
 
-Commands override built-ins with the same name.
+The Markdown body is the template; do not put `template` in frontmatter. `subtask` remains a deprecated alias for `subagent`. Commands override built-ins with the same name.
 
 ## MCP Servers
 
-**Docs:** https://opencode.ai/docs/mcp-servers/
+**Docs:** https://opencode.ai/v2/docs/mcp-servers/
 
-MCP servers add external tools via the Model Context Protocol. Two types:
+MCP servers live under `mcp.servers` (not directly under `mcp`), and use `disabled` instead of `enabled`:
 
 **Local** (runs as a process):
 ```json
 {
   "mcp": {
-    "my-server": {
-      "type": "local",
-      "command": ["npx", "-y", "my-mcp-command"],
-      "enabled": true,
-      "environment": { "MY_ENV": "value" },
-      "timeout": 5000
+    "servers": {
+      "my-server": {
+        "type": "local",
+        "command": ["npx", "-y", "my-mcp-command"],
+        "environment": { "MY_ENV": "value" }
+      }
     }
   }
 }
@@ -165,69 +182,48 @@ MCP servers add external tools via the Model Context Protocol. Two types:
 ```json
 {
   "mcp": {
-    "my-server": {
-      "type": "remote",
-      "url": "https://mcp.example.com/mcp",
-      "enabled": true,
-      "headers": { "Authorization": "Bearer {env:MY_KEY}" },
-      "oauth": {}
+    "servers": {
+      "my-server": {
+        "type": "remote",
+        "url": "https://mcp.example.com/mcp",
+        "headers": { "Authorization": "Bearer {env:MY_KEY}" }
+      }
     }
   }
 }
 ```
 
-OpenCode handles OAuth automatically for remote servers. Use `opencode mcp auth <name>` to authenticate.
+OAuth is automatic for remote servers; OAuth client fields use snake case (`client_id`, `client_secret`, `callback_port`, `redirect_uri`). Global timeouts live under `mcp.timeout` (`startup`, `catalog`, `execution`). Manage servers with `opencode mcp add/list/auth/logout` or `/mcps`.
 
-MCP tools can be controlled per-agent via `permission` with glob patterns (e.g., `"my-server_*": "deny"`).
+MCP tools can be controlled per-agent via `permissions` with `<server>_<tool>` action patterns.
 
 ### MCP File Locations in This Repo
 
 MCP templates are in `mcp/opencode.json`. Users copy relevant sections into their real config. Do not put secrets in templates; use `{env:...}` placeholders.
 
-## Custom Tools
+## Plugins
 
-**Docs:** https://opencode.ai/docs/custom-tools/
+**Docs:** https://opencode.ai/v2/docs/plugins/ and https://opencode.ai/v2/docs/build/plugins/
 
-Custom tools are TypeScript/JavaScript files the LLM can call. Place in:
-- Global: `~/.config/opencode/tools/`
-- Per-project: `.opencode/tools/`
+Plugins extend OpenCode with tools, hooks, and integrations. Configure them in `opencode.json` under `plugins`:
 
-**Tool definition (`.opencode/tools/my-tool.ts`):**
-```typescript
-import { tool } from "@opencode-ai/plugin"
-
-export default tool({
-  description: "Tool description",
-  args: {
-    param: tool.schema.string().describe("Parameter description"),
-  },
-  async execute(args, context) {
-    // context: { agent, sessionID, messageID, directory, worktree }
-    return "result"
-  },
-})
-```
-
-The filename becomes the tool name. Multiple exports per file create `<file>_<export>` tools. Custom tools can override built-in tools with the same name.
-
-## Rules / AGENTS.md
-
-**Docs:** https://opencode.ai/docs/rules/
-
-Project instructions go in `AGENTS.md` in the project root. Created via `/init` command or manually.
-
-**Precedence order:**
-1. Project `AGENTS.md` (or `CLAUDE.md` as fallback)
-2. Global `~/.config/opencode/AGENTS.md` (or `~/.claude/CLAUDE.md` as fallback)
-
-Use `opencode.json` `"instructions"` field to include additional files:
-```json
+```jsonc
 {
-  "instructions": ["CONTRIBUTING.md", "docs/guidelines.md", ".cursor/rules/*.md"]
+  "plugins": ["opencode-example-plugin", { "package": "./plugins/local", "options": { "enabled": true } }]
 }
 ```
 
-Remote URLs are also supported in `instructions`.
+OpenCode also auto-discovers direct `.ts`/`.js` files and plugin package directories from `.opencode/plugins/` and the global `~/.config/opencode/plugins/`. Manage them with `opencode plugin add/list/update/remove`.
+
+V1 plugin implementations do not run in V2; port them with the plugin migration guide.
+
+## Rules / AGENTS.md
+
+**Docs:** https://opencode.ai/v2/docs/instructions/
+
+Project instructions go in `AGENTS.md`. OpenCode loads the global `~/.config/opencode/AGENTS.md` first, then every `AGENTS.md` from the workspace up toward the home directory. V2 recognizes `AGENTS.md` only (no `CLAUDE.md` fallback).
+
+The `instructions` config field is accepted but not resolved in V2; use `AGENTS.md` for active instructions.
 
 ### Rule File Locations in This Repo
 
@@ -236,39 +232,33 @@ Remote URLs are also supported in `instructions`.
 
 ## Permissions
 
-**Docs:** https://opencode.ai/docs/permissions/ and https://opencode.ai/docs/tools/
+**Docs:** https://opencode.ai/v2/docs/permissions/ and https://opencode.ai/v2/docs/tools/ and https://opencode.ai/v2/docs/policies/
 
-Control tool access with `permission` in `opencode.json` or per-agent:
+Control tool access with ordered rules; the last matching rule wins:
 
 ```json
 {
-  "permission": {
-    "edit": "deny",
-    "bash": {
-      "*": "ask",
-      "git status": "allow",
-      "npm test": "allow"
-    },
-    "skill": {
-      "internal-*": "deny",
-      "my-skill": "allow"
-    }
-  }
+  "permissions": [
+    { "action": "shell", "resource": "*", "effect": "ask" },
+    { "action": "shell", "resource": "git status *", "effect": "allow" },
+    { "action": "edit", "resource": "*", "effect": "deny" },
+    { "action": "skill", "resource": "internal-*", "effect": "deny" }
+  ]
 }
 ```
 
-Permission values: `"allow"` (no prompt), `"ask"` (prompt for approval), `"deny"` (disabled).
+Permission values: `allow` (no prompt), `ask` (prompt for approval), `deny` (blocked). Glob patterns use `*` and `?`; a shell pattern ending in ` *` also matches the command without arguments.
 
-Glob patterns supported for wildcard matching. Last matching rule wins.
+Provider allow/deny lists moved to policies under `experimental.policies` (`provider.use` statements), which use the same ordered last-match-wins format.
 
 ## Key Rules for This Repo
 
 Skills are the single source of truth in `skills/<name>/SKILL.md` and are symlinked to all tool config dirs.
 
-Agent definitions in `agents/opencode/` follow the OpenCode markdown agent format.
+Agent definitions in `agents/opencode/` follow the OpenCode V2 markdown agent format.
 
 Do not edit files under `~/.config/opencode/`, `~/.claude/`, `~/.codex/`, or `~/.agents/` — edit this repo and re-run `bash setup.sh`.
 
 After adding a new skill to `skills/<name>/`, update `setup.sh` if needed and run it to create symlinks.
 
-After changing agent definitions or setup.sh symlink behavior, verify with `opencode agent list`.
+After changing agent definitions or setup.sh symlink behavior, verify with `opencode debug agents`.

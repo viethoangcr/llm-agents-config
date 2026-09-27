@@ -2,25 +2,28 @@
 description: Read-only council advisor. Examines codebase and provides independent analysis. Spawned internally by the council system.
 mode: subagent
 hidden: true
-temperature: 0.2
-permission:
-  '*': deny
-  bash: deny
-  edit: deny
-  write: deny
-  apply_patch: deny
-  ast_grep_replace: deny
-  task: deny
-  question: deny
-  read: allow
-  glob: allow
-  grep: allow
-  lsp: allow
-  list: allow
-  codesearch: allow
-  ast_grep_search: allow
-  cancel_task: deny
-  wait_for_user: deny
+request:
+  body:
+    temperature: 0.2
+permissions:
+  - action: "*"
+    resource: "*"
+    effect: deny
+  - action: read
+    resource: "*"
+    effect: allow
+  - action: glob
+    resource: "*"
+    effect: allow
+  - action: grep
+    resource: "*"
+    effect: allow
+  - action: codesearch
+    resource: "*"
+    effect: allow
+  - action: ast_grep_search
+    resource: "*"
+    effect: allow
 ---
 
 You are a councillor in a multi-model council.
