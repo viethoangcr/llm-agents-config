@@ -3,7 +3,7 @@
 Replicates the agent **specifications** from the `oh-my-opencode-slim` plugin
 using only official OpenCode agent definitions (`.md` files with frontmatter,
 per https://opencode.ai). No plugin is installed — you get the same prompts,
-roles, temperatures, and permission objects as `src/agents/*.ts`.
+roles, temperatures, and permissions as `src/agents/*.ts`.
 
 ## Agents
 
@@ -22,12 +22,12 @@ roles, temperatures, and permission objects as `src/agents/*.ts`.
 Notes on fidelity vs the plugin:
 - Every agent omits `model`, matching the plugin's default (`model: undefined`
   → agents follow the global/session model).
-- Permissions replicate `applyDefaultPermissions()` (`question: allow` on all;
+- Permissions use the V2 `permissions` rule array (`question: allow` on all;
   `cancel_task`/`wait_for_user` only on the orchestrator) plus the strict
   read-only allowlist on `councillor` and the deny-all on `council`.
 - Every subagent prompt carries the task-rejection suffix
   ("If a task is outside your role...").
-- `observer.md` sets `disable: true` to match `DEFAULT_DISABLED_AGENTS`;
+- `observer.md` sets `disabled: true` to match `DEFAULT_DISABLED_AGENTS`;
   remove it to enable.
 - The orchestrator prompt is a **static snapshot** of `buildOrchestratorPrompt()`
   with all specialists enabled.
@@ -35,15 +35,15 @@ Notes on fidelity vs the plugin:
 ## Setup
 
 ```bash
-./setup.sh            # install to ~/.config/opencode/agent (global)
-./setup.sh project    # install to ./.opencode/agent (this project)
+./setup.sh            # install to ~/.config/opencode/agents (global)
+./setup.sh project    # install to ./.opencode/agents (this project)
 ```
 
 The script copies the `.md` files to the target agent directory and sets
 `"default_agent": "orchestrator"` in the corresponding `opencode.json`
 (preserving existing keys). Then **quit and restart opencode**.
 
-To enable librarian's `context7` / `gh_grep`, uncomment and fill the `mcp`
+To enable librarian's `context7` / `gh_grep`, uncomment and fill the `mcp.servers`
 block at the bottom of `setup.sh` (or add them to your own `opencode.json`).
 
 ## Models
@@ -69,12 +69,13 @@ cp models.json.example models.json
 }
 ```
 
-Setup merges these into `opencode.json` under `agent.<name>.model` (and
-`.variant`). Suggestions per role are annotated in `models.json.example`
-(e.g. cheap/fast models for `explorer`/`fixer`, vision model required for
-`observer`, strongest reasoning for `oracle`). Override any subset — agents
-not listed keep following the global model. You can also point setup at a
-different file with `MODELS_FILE=/path/to/models.json`.
+Setup merges these into `opencode.json` under `agents.<name>.model` (joining
+`model` and `variant` as `provider/model#variant`, and writing `temperature` to
+`agents.<name>.request.body.temperature`). Suggestions per role are annotated in
+`models.json.example` (e.g. cheap/fast models for `explorer`/`fixer`, vision
+model required for `observer`, strongest reasoning for `oracle`). Override any
+subset — agents not listed keep following the global model. You can also point
+setup at a different file with `MODELS_FILE=/path/to/models.json`.
 
 Per-agent models can instead be set directly in each `.md`'s frontmatter
 (`model: provider/model-id`), or globally in `opencode.json` (`"model": ...`).
@@ -148,15 +149,16 @@ Apply a preset when installing:
 ```
 
 OpenCode has no native "preset" concept, so setup translates a preset into
-`opencode.json` by setting `agent.<name>.model`/`.variant` for each listed
-agent (agents not in the preset follow the global model). A `models.json`
-in this directory is applied on top of the preset, so you can start from a
-preset and tweak individual agents. Agents outside a preset are untouched;
-to switch presets later, just re-run setup with a different `--preset`.
+`opencode.json` by setting `agents.<name>.model` to `provider/model#variant`
+for each listed agent (agents not in the preset follow the global model). A
+`models.json` in this directory is applied on top of the preset, so you can
+start from a preset and tweak individual agents. Agents outside a preset are
+untouched; to switch presets later, just re-run setup with a different
+`--preset`.
 
 Note: in the plugin, the `opencode-go` preset also enables the observer
 (`disabled_agents: []`), and the `opencode-go`/`anthropic-openai` presets map
-it. This standalone ships `observer.md` with `disable: true`, so to use it,
+it. This standalone ships `observer.md` with `disabled: true`, so to use it,
 remove that line from the file after setup.
 
 ## What is NOT replicated

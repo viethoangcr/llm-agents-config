@@ -3,8 +3,8 @@
 # Install the standalone opencode agents WITHOUT the oh-my-opencode-slim plugin.
 #
 # Usage:
-#   ./setup.sh                          # install to global scope (~/.config/opencode/agent)
-#   ./setup.sh project                  # install to project scope (.opencode/agent in cwd)
+#   ./setup.sh                          # install to global scope (~/.config/opencode/agents)
+#   ./setup.sh project                  # install to project scope (.opencode/agents in cwd)
 #   ./setup.sh --preset openai          # global scope + apply the openai model preset
 #   ./setup.sh project --preset openai  # project scope + openai preset
 #
@@ -53,11 +53,11 @@ fi
 
 case "$SCOPE" in
   global)
-    DEST="${OPENCODE_AGENT_DIR:-$HOME/.config/opencode/agent}"
+    DEST="${OPENCODE_AGENT_DIR:-$HOME/.config/opencode/agents}"
     CONFIG="${OPENCODE_CONFIG:-$HOME/.config/opencode/opencode.json}"
     ;;
   project)
-    DEST=".opencode/agent"
+    DEST=".opencode/agents"
     CONFIG="${OPENCODE_CONFIG:-opencode.json}"
     ;;
 esac
@@ -91,24 +91,44 @@ if os.path.exists(path):
 
 data.setdefault("$schema", "https://opencode.ai/config.json")
 data["default_agent"] = "orchestrator"
-agents = data.setdefault("agent", {})
+agents = data.setdefault("agents", {})
+
+def clear_model(entry):
+    entry.pop("model", None)
+    request = entry.get("request")
+    body = request.get("body") if isinstance(request, dict) else None
+    if isinstance(body, dict):
+        body.pop("temperature", None)
+        if not body:
+            request.pop("body", None)
+        if not request:
+            entry.pop("request", None)
+
+def set_model(entry, cfg):
+    model = cfg.get("model")
+    if model:
+        variant = cfg.get("variant")
+        entry["model"] = f"{model}#{variant}" if variant else model
+    temperature = cfg.get("temperature")
+    if temperature is not None:
+        entry.setdefault("request", {}).setdefault("body", {})["temperature"] = temperature
 
 def merge_models(models, source, replace=False):
     applied = 0
     for name, cfg in models.items():
         if not isinstance(cfg, dict):
             continue  # ignore non-agent keys like "$comment"
-        merged = {k: v for k, v in cfg.items() if k in ("model", "variant", "temperature")}
-        if merged:
-            entry = agents.setdefault(name, {})
-            if replace:
-                # A preset fully defines the model mapping: drop keys the new
-                # preset no longer sets (e.g. a removed variant), so switching
-                # presets cannot leave stale values behind.
-                for k in ("model", "variant", "temperature"):
-                    entry.pop(k, None)
-            entry.update(merged)
-            applied += 1
+        allowed = {k: v for k, v in cfg.items() if k in ("model", "variant", "temperature")}
+        if not allowed:
+            continue
+        entry = agents.setdefault(name, {})
+        if replace:
+            # A preset fully defines the model mapping: drop the keys the new
+            # preset no longer sets (e.g. a removed variant), so switching
+            # presets cannot leave stale values behind.
+            clear_model(entry)
+        set_model(entry, allowed)
+        applied += 1
     if applied:
         print(f"merged per-agent models from {source}")
 
@@ -132,7 +152,7 @@ if os.path.exists(models_path):
 # Optional: librarian expects context7 + gh_grep MCP servers. Uncomment and
 # fill in real server config to enable them; otherwise all agents share
 # whatever MCP servers opencode has configured globally.
-# data.setdefault("mcp", {}).update({
+# data.setdefault("mcp", {}).setdefault("servers", {}).update({
 #     "context7": {"type": "remote", "url": "https://mcp.context7.com/mcp"},
 #     "gh_grep":   {"type": "remote", "url": "<gh_grep mcp url>"},
 # })

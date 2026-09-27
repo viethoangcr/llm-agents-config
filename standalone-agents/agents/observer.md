@@ -1,12 +1,20 @@
 ---
 description: Visual analysis. Use for interpreting images, screenshots, PDFs, and diagrams - extracts structured observations without loading raw files into main context. Requires a vision-capable model.
 mode: subagent
-disable: true
-temperature: 0.1
-permission:
-  question: allow
-  cancel_task: deny
-  wait_for_user: deny
+disabled: true
+request:
+  body:
+    temperature: 0.1
+permissions:
+  - action: question
+    resource: "*"
+    effect: allow
+  - action: cancel_task
+    resource: "*"
+    effect: deny
+  - action: wait_for_user
+    resource: "*"
+    effect: deny
 ---
 
 You are Observer - a visual analysis specialist.

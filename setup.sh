@@ -100,15 +100,15 @@ echo ""
 echo "=== OpenCode verification ==="
 if command -v opencode >/dev/null 2>&1; then
   for name in ask chat; do
-    if opencode agent list 2>/dev/null | grep -q "^$name (primary)$"; then
-      echo "  ✓ OpenCode detected $name (primary)"
+    if opencode debug agents 2>/dev/null | grep -q "\"id\": \"$name\""; then
+      echo "  ✓ OpenCode detected $name"
     else
-      echo "  ⚠ OpenCode did not detect $name (primary)"
+      echo "  ⚠ OpenCode did not detect $name"
       echo "    Check for a blocking non-symlink at ~/.config/opencode/agents/$name.md"
       echo "    Restart OpenCode after setup if it was already running"
     fi
   done
-  echo "  ℹ Primary agents are selected with Tab or 'opencode --agent <name>'"
+  echo "  ℹ Inspect agents with 'opencode debug agents'"
 else
   echo "  ℹ opencode CLI not found; skipped agent verification"
 fi

@@ -18,7 +18,7 @@
 - Run `bash setup.sh` from the repo root to create or refresh symlinks.
 - `setup.sh` is intentionally non-destructive: it skips existing non-symlink files and never deletes old duplicates.
 - When adding a skill, create `skills/<name>/SKILL.md`, then update any tool-specific docs/config snippets that mention the available skills.
-- If changing symlink targets or setup output, verify `setup.sh` still links OpenCode, Claude Code, Codex, and the `agentic-sdlc` namespaced skill paths. For OpenCode changes, also verify `opencode agent list` includes `ask (primary)`.
+- If changing symlink targets or setup output, verify `setup.sh` still links OpenCode, Claude Code, Codex, and the `agentic-sdlc` namespaced skill paths. For OpenCode changes, also verify `opencode debug agents` includes `ask`.
 
 ## Gotchas
 - Do not edit generated or installed files under `~/.config/opencode`, `~/.claude`, `~/.codex`, or `~/.agents`; edit this repo and rerun `bash setup.sh`.
