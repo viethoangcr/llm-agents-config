@@ -54,7 +54,7 @@ Terminal/CLI preferences (theme, keybinds, diffs, session UI) live in the separa
 
 Agents are specialized AI assistants with custom prompts, models, and permissions. Two types:
 
-- **Primary agents** — main assistants cycled via Tab key (e.g., Build, Plan)
+- **Primary agents** — main assistants cycled with Shift+Tab (e.g., Build, Plan)
 - **Subagents** — invoked by primary agents or via @mention (e.g., General, Explore)
 
 Define agents in `opencode.json` under the `agents` key, or as markdown files in:
@@ -88,6 +88,8 @@ System prompt content here...
 ```
 
 The filename becomes the agent name (e.g., `review.md` creates `review`). The Markdown body is the agent's `system` prompt. Do not use legacy fields such as `temperature` (top level), `prompt`, `permission`, `tools`, `disable`, or `maxSteps`.
+
+Note: V2 currently preserves `request.settings`, `request.headers`, and `request.body` but does not send them with model requests yet. Configure active request settings on the provider, model, or model variant instead.
 
 Permission actions: `read`, `edit`, `glob`, `grep`, `shell`, `subagent`, `skill`, `question`, `webfetch`, `websearch`, `external_directory`, `<server>_<tool>` for MCP tools, and plugin-defined strings. Values: `allow`, `ask`, `deny`.
 

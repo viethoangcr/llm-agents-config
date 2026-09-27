@@ -99,8 +99,15 @@ done
 echo ""
 echo "=== OpenCode verification ==="
 if command -v opencode >/dev/null 2>&1; then
+  # The first query for a location can return an empty list while OpenCode
+  # boots that location, so retry once before reporting a miss.
+  agents_json="$(opencode debug agents 2>/dev/null || true)"
+  if ! grep -q '"id":' <<<"$agents_json"; then
+    sleep 1
+    agents_json="$(opencode debug agents 2>/dev/null || true)"
+  fi
   for name in ask chat; do
-    if opencode debug agents 2>/dev/null | grep -q "\"id\": \"$name\""; then
+    if grep -q "\"id\": \"$name\"" <<<"$agents_json"; then
       echo "  ✓ OpenCode detected $name"
     else
       echo "  ⚠ OpenCode did not detect $name"
