@@ -89,8 +89,9 @@ the high-volume lanes, with GLM-5.3-Flash reserved for the frontend agent
 (designer) only. `anthropic-openai` is a new dual-provider preset (see below).
 The `openai`, `hybrid`, and `anthropic-openai` presets were refreshed
 2026-09-22 for Claude Opus 5.5 and the GPT-6 family (`sol` reasoning,
-`luna` cost/vision). Original plugin mappings are noted in each preset's
-`$comment`.
+`luna` cost/vision). `gpt-6-luna` is never used below `medium`: `medium` for
+simple read/summarize lanes, `high`/`xhigh` for more complex ones. Original
+plugin mappings are noted in each preset's `$comment`.
 
 | Preset | File | Agents |
 |--------|------|--------|
@@ -137,7 +138,7 @@ reasoning/implementation/vision/cost lanes:
 | orchestrator | `anthropic/claude-opus-5-5` (`high`) | newest Opus: 1M ctx, image/PDF, cheaper than Opus 5 ($4/$20 vs $5/$25) |
 | oracle | `openai/gpt-6-sol` (`xhigh`) | deepest reasoning, independent family from the orchestrator |
 | designer | `anthropic/claude-opus-5-5` (`medium`) | design taste on the newest Opus; low-volume lane |
-| explorer | `openai/gpt-6-luna` (`low`) | 1.05M ctx, cheapest lane ($0.10/$0.50) |
+| explorer | `openai/gpt-6-luna` (`medium`) | 1.05M ctx, cheapest lane ($0.10/$0.50) |
 | librarian | `openai/gpt-6-luna` (`high`) | long-context docs research, image/PDF input |
 | fixer | `openai/gpt-6-sol` (`medium`) | latest-generation mid-tier; lower effort than the oracle for the implementation lane |
 | observer | `openai/gpt-6-sol` (`medium`) | image/PDF vision; low-volume agent, so cost is moot |

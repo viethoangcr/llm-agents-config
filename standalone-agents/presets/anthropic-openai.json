@@ -3,7 +3,7 @@
   "orchestrator": { "model": "anthropic/claude-opus-5-5", "variant": "high" },
   "oracle": { "model": "openai/gpt-6-sol", "variant": "xhigh" },
   "designer": { "model": "anthropic/claude-opus-5-5", "variant": "medium" },
-  "explorer": { "model": "openai/gpt-6-luna", "variant": "low" },
+  "explorer": { "model": "openai/gpt-6-luna", "variant": "medium" },
   "librarian": { "model": "openai/gpt-6-luna", "variant": "high" },
   "fixer": { "model": "openai/gpt-6-sol", "variant": "medium" },
   "observer": { "model": "openai/gpt-6-sol", "variant": "medium" }
