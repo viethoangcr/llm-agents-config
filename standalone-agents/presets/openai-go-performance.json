@@ -1,0 +1,12 @@
+{
+  "$comment": "Performance preset for a machine with BOTH an OpenAI subscription and OpenCode Go. Task-first split: OpenAI gpt-6.1-sol drives the synthesis/decision/implementation/design lanes (orchestrator, oracle, designer, fixer, council) with gpt-6-luna for vision (observer); OpenCode Go deepseek-v4.1-flash handles recon/docs and supplies the council's DeepSeek base advisor. Model families are restricted to GPT, DeepSeek, and GLM-5.3-Flash (GLM not required); Sol runs only at medium/high and DeepSeek only at high/max. Requires ChatGPT/Codex OAuth (OpenAI Business/Enterprise workplace entitlement) for the openai provider; Go is quota-limited per model (no automatic fallback). Covers all nine standalone agents (observer ships disabled). Apply with: ./setup.sh --preset openai-go-performance. Agents not listed follow the global model.",
+  "orchestrator": { "model": "openai/gpt-6.1-sol", "variant": "high" },
+  "oracle": { "model": "openai/gpt-6.1-sol", "variant": "high" },
+  "librarian": { "model": "opencode-go/deepseek-v4.1-flash", "variant": "high" },
+  "explorer": { "model": "opencode-go/deepseek-v4.1-flash", "variant": "high" },
+  "designer": { "model": "openai/gpt-6.1-sol", "variant": "high" },
+  "fixer": { "model": "openai/gpt-6.1-sol", "variant": "high" },
+  "observer": { "model": "openai/gpt-6-luna", "variant": "medium" },
+  "council": { "model": "openai/gpt-6.1-sol", "variant": "high" },
+  "councillor": { "model": "opencode-go/deepseek-v4.1-flash", "variant": "high" }
+}

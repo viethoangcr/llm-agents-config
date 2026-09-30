@@ -1,10 +1,10 @@
 {
-  "$comment": "Anthropic + OpenAI preset (fable and astra excluded), refreshed 2026-09-22 for Claude Opus 5.5 and the GPT-6 family. Claude drives orchestration and design; OpenAI covers the reasoning/implementation/vision/cost lanes (oracle, explorer, librarian, fixer, observer). Apply with: ./setup.sh --preset anthropic-openai. Agents not listed follow the global model.",
+  "$comment": "Anthropic + OpenAI preset (fable and astra excluded), refreshed 2026-09-30: OpenAI reasoning lanes upgraded to gpt-6.1-sol (Claude Opus 5.5 unchanged). Claude drives orchestration and design; OpenAI covers the reasoning/implementation/vision/cost lanes (oracle, explorer, librarian, fixer, observer). Apply with: ./setup.sh --preset anthropic-openai. Agents not listed follow the global model.",
   "orchestrator": { "model": "anthropic/claude-opus-5-5", "variant": "high" },
-  "oracle": { "model": "openai/gpt-6-sol", "variant": "xhigh" },
+  "oracle": { "model": "openai/gpt-6.1-sol", "variant": "xhigh" },
   "designer": { "model": "anthropic/claude-opus-5-5", "variant": "medium" },
   "explorer": { "model": "openai/gpt-6-luna", "variant": "medium" },
   "librarian": { "model": "openai/gpt-6-luna", "variant": "high" },
-  "fixer": { "model": "openai/gpt-6-sol", "variant": "medium" },
-  "observer": { "model": "openai/gpt-6-sol", "variant": "medium" }
+  "fixer": { "model": "openai/gpt-6.1-sol", "variant": "medium" },
+  "observer": { "model": "openai/gpt-6.1-sol", "variant": "medium" }
 }
