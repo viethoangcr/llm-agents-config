@@ -1,0 +1,12 @@
+{
+  "$comment": "Research preset for a machine with BOTH an OpenAI subscription and OpenCode Go. Same OpenAI/Go split as openai-go-performance but tuned for research fit: the librarian moves onto gpt-6.1-sol (high) for stronger evidence work, the councillor runs DeepSeek at max, and the fixer drops to medium for bounded execution (better fit, not a guaranteed quality win; higher variants run slower and consume more quota). Model families are restricted to GPT, DeepSeek, and GLM-5.3-Flash (GLM not required); Sol runs only at medium/high and DeepSeek only at high/max. Requires ChatGPT/Codex OAuth (OpenAI Business/Enterprise workplace entitlement) for the openai provider; Go is quota-limited per model (no automatic fallback). Covers all nine standalone agents (observer ships disabled). Apply with: ./setup.sh --preset openai-go-research. Agents not listed follow the global model.",
+  "orchestrator": { "model": "openai/gpt-6.1-sol", "variant": "high" },
+  "oracle": { "model": "openai/gpt-6.1-sol", "variant": "high" },
+  "librarian": { "model": "openai/gpt-6.1-sol", "variant": "high" },
+  "explorer": { "model": "opencode-go/deepseek-v4.1-flash", "variant": "high" },
+  "designer": { "model": "openai/gpt-6.1-sol", "variant": "high" },
+  "fixer": { "model": "openai/gpt-6.1-sol", "variant": "medium" },
+  "observer": { "model": "openai/gpt-6-luna", "variant": "medium" },
+  "council": { "model": "openai/gpt-6.1-sol", "variant": "high" },
+  "councillor": { "model": "opencode-go/deepseek-v4.1-flash", "variant": "max" }
+}

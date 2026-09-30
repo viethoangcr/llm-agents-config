@@ -43,6 +43,39 @@ copy_if_missing() {
   fi
 }
 
+merge_opencode_policies() {
+  local src="$1" dst="$2"
+  python3 - "$src" "$dst" <<'PY'
+import json, os, sys
+
+source_path, target_path = sys.argv[1:3]
+with open(source_path, encoding="utf-8") as f:
+    source = json.load(f)
+with open(target_path, encoding="utf-8") as f:
+    target = json.load(f)
+
+managed = source.get("experimental", {}).get("policies", [])
+if not isinstance(managed, list):
+    raise SystemExit(f"error: experimental.policies must be a list in {source_path}")
+
+experimental = target.setdefault("experimental", {})
+if not isinstance(experimental, dict):
+    raise SystemExit(f"error: experimental must be an object in {target_path}")
+policies = experimental.setdefault("policies", [])
+if not isinstance(policies, list):
+    raise SystemExit(f"error: experimental.policies must be a list in {target_path}")
+
+managed_entries = {json.dumps(item, sort_keys=True) for item in managed}
+policies[:] = [item for item in policies if json.dumps(item, sort_keys=True) not in managed_entries]
+policies.extend(managed)
+
+with open(target_path, "w", encoding="utf-8") as f:
+    json.dump(target, f, indent=2)
+    f.write("\n")
+print(f"  ✓ merged provider policies: {target_path}")
+PY
+}
+
 link_over() {
   local src="$1" dst="$2"
   if [ -e "$dst" ] && [ ! -L "$dst" ]; then
@@ -89,6 +122,7 @@ done
 
 # Config — opencode.json (copy, not symlink — OpenCode may write to it)
 copy_if_missing "$REPO/config/opencode.json" "$HOME/.config/opencode/opencode.json"
+merge_opencode_policies "$REPO/config/opencode.json" "$HOME/.config/opencode/opencode.json"
 
 # Commands — symlink each command into OpenCode commands dir
 for cmd in "$REPO"/commands/*.md; do
