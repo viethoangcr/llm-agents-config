@@ -83,13 +83,15 @@ Per-agent models can instead be set directly in each `.md`'s frontmatter
 ## Presets
 
 Bundled model presets under `presets/`, mirrored from the plugin's
-`src/cli/providers.ts` (`MODEL_MAPPINGS`) — except `opencode-go` and
-`anthropic-openai`. `opencode-go` was updated 2026-09: DeepSeek V4.1-Flash on
+`src/cli/providers.ts` (`MODEL_MAPPINGS`) — except `opencode-go`,
+`anthropic-openai`, `openai-go-performance`, and `openai-go-research`.
+`opencode-go` was updated 2026-09: DeepSeek V4.1-Flash on
 the high-volume lanes, with GLM-5.3-Flash reserved for the frontend agent
 (designer) only. `anthropic-openai` is a new dual-provider preset (see below).
 The `openai`, `hybrid`, and `anthropic-openai` presets were refreshed
-2026-09-22 for Claude Opus 5.5 and the GPT-6 family (`sol` reasoning,
-`luna` cost/vision). `gpt-6-luna` is never used below `medium`: `medium` for
+2026-09-30, upgrading the reasoning lanes to the newer `gpt-6.1-sol`
+(Claude Opus 5.5 unchanged); the GPT-6 family keeps `luna` for cost/vision.
+`gpt-6-luna` is never used below `medium`: `medium` for
 simple read/summarize lanes, `high`/`xhigh` for more complex ones. Original
 plugin mappings are noted in each preset's `$comment`.
 
@@ -98,6 +100,8 @@ plugin mappings are noted in each preset's `$comment`.
 | `openai` (default) | `presets/openai.json` | orchestrator, oracle, librarian, explorer, designer, fixer |
 | `hybrid` | `presets/hybrid.json` | OpenAI + OpenCode Go mix — see below |
 | `anthropic-openai` | `presets/anthropic-openai.json` | Anthropic + OpenAI mix, fable/astra excluded — see below |
+| `openai-go-performance` | `presets/openai-go-performance.json` | all 9 agents — OpenAI subscription + Go, task-first — see below |
+| `openai-go-research` | `presets/openai-go-research.json` | all 9 agents — OpenAI subscription + Go, deeper research — see below |
 | `opencode-go` | `presets/opencode-go.json` | + observer (vision model) |
 | `kimi` | `presets/kimi.json` | the 6 core agents |
 | `copilot` | `presets/copilot.json` | the 6 core agents (github-copilot models) |
@@ -110,8 +114,8 @@ presets are single-provider; this mixes to use the strongest model per agent:
 
 | Agent | Model | Why |
 |-------|-------|-----|
-| orchestrator | `openai/gpt-6-sol` (`high`) | newest reasoning tier; vision + tool-calling at $2/$10 |
-| oracle | `openai/gpt-6-sol` (`xhigh`) | deepest reasoning for high-stakes review |
+| orchestrator | `openai/gpt-6.1-sol` (`high`) | newest reasoning tier; vision + tool-calling at $2/$10 |
+| oracle | `openai/gpt-6.1-sol` (`xhigh`) | deepest reasoning for high-stakes review |
 | designer | `openai/gpt-6-luna` (`medium`) | needs vision (screenshots/renders) + taste |
 | librarian | `opencode-go/deepseek-v4.1-flash` (`high`) | long-context docs, cheap + fast |
 | explorer | `opencode-go/deepseek-v4.1-flash` (`high`) | high-volume, cheap + fast |
@@ -136,16 +140,106 @@ reasoning/implementation/vision/cost lanes:
 | Agent | Model | Why |
 |-------|-------|-----|
 | orchestrator | `anthropic/claude-opus-5-5` (`high`) | newest Opus: 1M ctx, image/PDF, cheaper than Opus 5 ($4/$20 vs $5/$25) |
-| oracle | `openai/gpt-6-sol` (`xhigh`) | deepest reasoning, independent family from the orchestrator |
+| oracle | `openai/gpt-6.1-sol` (`xhigh`) | deepest reasoning, independent family from the orchestrator |
 | designer | `anthropic/claude-opus-5-5` (`medium`) | design taste on the newest Opus; low-volume lane |
 | explorer | `openai/gpt-6-luna` (`medium`) | 1.05M ctx, cheapest lane ($0.10/$0.50) |
 | librarian | `openai/gpt-6-luna` (`high`) | long-context docs research, image/PDF input |
-| fixer | `openai/gpt-6-sol` (`medium`) | latest-generation mid-tier; lower effort than the oracle for the implementation lane |
-| observer | `openai/gpt-6-sol` (`medium`) | image/PDF vision; low-volume agent, so cost is moot |
+| fixer | `openai/gpt-6.1-sol` (`medium`) | latest-generation mid-tier; lower effort than the oracle for the implementation lane |
+| observer | `openai/gpt-6.1-sol` (`medium`) | image/PDF vision; low-volume agent, so cost is moot |
 
-Swap the orchestrator to `openai/gpt-6-sol` (`medium`) or
+Swap the orchestrator to `openai/gpt-6.1-sol` (`medium`) or
 `openai/gpt-6-luna` (`max`, cheapest) if `opus-5-5` ($4/$20) is
 too expensive or slow for the always-on lane.
+
+### OpenAI subscription + OpenCode Go (`openai-go-performance`, `openai-go-research`)
+
+Two task-first presets for a machine with **both** a ChatGPT/Codex
+**subscription** and OpenCode Go. Both cover all nine standalone agents, so a
+single preset fully defines the mapping. Within these presets model families are
+restricted to GPT, DeepSeek, and GLM-5.3-Flash (GLM not required); GPT-6.1 Sol
+runs only at `medium`/`high` and DeepSeek only at `high`/`max`. The research
+preset shifts effort toward evidence work and bounded execution, and changes the
+default council advisor:
+
+| Agent | `openai-go-performance` | `openai-go-research` |
+|-------|-------------------------|----------------------|
+| orchestrator | `openai/gpt-6.1-sol` (`high`) | same |
+| oracle | `openai/gpt-6.1-sol` (`high`) | same |
+| librarian | `opencode-go/deepseek-v4.1-flash` (`high`) | `openai/gpt-6.1-sol` (`high`) |
+| explorer | `opencode-go/deepseek-v4.1-flash` (`high`) | same |
+| designer | `openai/gpt-6.1-sol` (`high`) | same |
+| fixer | `openai/gpt-6.1-sol` (`high`) | `openai/gpt-6.1-sol` (`medium`) |
+| observer | `openai/gpt-6-luna` (`medium`) | same |
+| council | `openai/gpt-6.1-sol` (`high`) | same |
+| councillor | `opencode-go/deepseek-v4.1-flash` (`high`) | `opencode-go/deepseek-v4.1-flash` (`max`) |
+
+Rationale: `gpt-6.1-sol` is OpenAI's flagship reasoning/coding model with
+multimodal input, so it takes the synthesis, decision, implementation, and
+design lanes (orchestrator, oracle, designer, fixer, council); `gpt-6-luna`
+covers vision (`observer`). This is a role-based preference from documented
+capabilities — **not** a measured claim that Sol is superior at design or task
+execution. Go `deepseek-v4.1-flash` handles efficient recon (`explorer`) and
+docs/performance research (`librarian`, performance preset), and provides the
+council's base advisor: the `councillor` runs a DeepSeek model distinct from the
+OpenAI synthesizer to give a default alternative perspective — that is not an
+automatic multi-model council; real fanout still requires explicit per-seat
+model overrides (see "What is NOT replicated").
+
+`openai-go-research` differentiates by research fit rather than raw depth: the
+librarian moves onto `gpt-6.1-sol` (`high`) for stronger evidence work, the
+councillor runs DeepSeek at `max`, and the fixer drops to `medium` for bounded
+execution. Both presets keep the oracle at Sol `high` — research does **not**
+assert a deeper oracle. Variant depth is a tradeoff, not a guaranteed quality
+win; higher variants run slower and consume more quota.
+
+The family and variant constraints apply to these two presets only — the other
+bundled presets are unchanged. GLM-5.3-Flash is permitted but not required;
+neither preset currently uses it.
+
+**Entitlement and auth (separate from this repo's templates).** The `openai`
+provider must use your ChatGPT/Codex **OAuth** login, not an API key, for
+subscription-covered access.
+OpenAI Business/Enterprise accounts are supported when the workplace grants the
+Codex entitlement and the admin permits OAuth; an API-key billing setup does
+**not** grant subscription access. Verify your account's available models via
+`/models` before applying a preset. The live model catalog is the source of
+truth for IDs/variants — confirm `gpt-6.1-sol`, `gpt-6-luna`, and the Go model
+IDs exist for your account; entitlement is checked separately from the
+recommendation. OpenCode Go is quota-limited **per model** over rolling windows
+with **no automatic fallback** — exhausting one model does not silently switch
+to another.
+
+**Provider-use policy is not changed by these presets.** These templates only
+write per-agent model mappings; they don't alter auth or the provider allow
+policy. If your `opencode.json` already allows only OpenCode Go, add a minimal
+`provider.use` rule for OpenAI **after** the deny-all and Go allow entries.
+Given the existing shape in `config/opencode.json`:
+
+```json
+"experimental": {
+  "policies": [
+    { "action": "provider.use", "resource": "*", "effect": "deny" },
+    { "action": "provider.use", "resource": "opencode-go", "effect": "allow" },
+    { "action": "provider.use", "resource": "openai", "effect": "allow" }
+  ]
+}
+```
+
+Notes: `observer` is mapped but ships **disabled** (remove `disabled: true`
+from `agents/observer.md` to use it). A local `models.json` in this directory is
+applied on top of the preset, so it overrides any agent (see "Models"). Switch
+between the two with a different `--preset`; the presets are full nine-agent
+mappings, so re-running setup leaves no stale variants behind. Command names
+come from this `standalone-agents` directory, e.g.
+`./setup.sh --preset openai-go-performance`.
+
+Sources (researched 2026-09-30):
+[Sol announcement](https://openai.com/index/introducing-gpt-6-1-sol/) ·
+[Sol model docs](https://developers.openai.com/api/docs/models/gpt-6.1-sol) ·
+[Codex auth](https://developers.openai.com/codex/auth) ·
+[OpenCode Go console](https://opencode.ai/v2/docs/console/go/) ·
+[providers](https://opencode.ai/v2/docs/cli/providers/) ·
+[models](https://opencode.ai/v2/docs/models/).
 
 Apply a preset when installing:
 
