@@ -17,10 +17,16 @@ Keep the description lowercase and hyphenated, for example `feat/refresh-model-p
 
 ### Title
 
-- Imperative, sentence case, no type prefix, no trailing period.
+Use a Conventional Commits-style title: `<type>(<scope>): <summary>`.
+
+- Types: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`.
+- Scope is required when the change is limited to one area; use `config` for
+  cross-cutting configuration updates.
+- Summary is lowercase, imperative, and has no trailing period.
 - Describe the whole change against the base branch, not the last commit.
-- Examples: `Refresh November model presets and sync OpenCode V2 config`,
-  `Add text-compress skill`.
+- The title becomes the squash commit subject, so keep it accurate.
+- Examples: `feat(config): refresh November model presets and sync OpenCode V2 config`,
+  `feat(skills): add text-compress skill`.
 
 ### Description
 

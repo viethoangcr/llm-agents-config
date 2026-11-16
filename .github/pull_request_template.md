@@ -20,7 +20,7 @@
 
 ## Checklist
 
-- [ ] PR title is imperative, sentence case, with no type prefix or trailing period.
+- [ ] PR title follows `<type>(<scope>): <summary>` with a lowercase, imperative summary and no trailing period.
 - [ ] Description covers the full diff against the base branch.
 - [ ] Affected JSON, TOML, Markdown, and shell files were checked.
 - [ ] No secrets or machine-specific paths were added.
