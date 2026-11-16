@@ -1,9 +1,8 @@
 {
-  "$comment": "OpenAI preset, mirrored from oh-my-opencode-slim src/cli/providers.ts MODEL_MAPPINGS.openai, refreshed 2026-09-30: reasoning lanes upgraded to gpt-6.1-sol, gpt-6-luna kept for the high-volume/vision lanes. Apply with: ./setup.sh --preset openai. Agents not listed follow the global model.",
+  "$comment": "OpenAI preset, refreshed 2026-11-16: GPT-6.1 Sol stays on the reasoning lanes; GPT-6.1 Terra (released 2026-10-26, $1/$5, 1.05M context, vision/PDF, 50.3% Terminal-Bench 4.0 at max) takes the design and bounded-implementation lanes where its writing, visual reasoning, and speed fit better than Sol and its $1/$5 price beats Luna on capability. GPT-6 Luna stays the cheap recon lane; point explorer at Terra if you want stronger long-context docs research. Apply with: ./setup.sh --preset openai. Agents not listed follow the global model.",
   "orchestrator": { "model": "openai/gpt-6.1-sol", "variant": "high" },
   "oracle": { "model": "openai/gpt-6.1-sol", "variant": "xhigh" },
-  "librarian": { "model": "openai/gpt-6-luna", "variant": "high" },
   "explorer": { "model": "openai/gpt-6-luna", "variant": "medium" },
-  "designer": { "model": "openai/gpt-6-luna", "variant": "medium" },
-  "fixer": { "model": "openai/gpt-6-luna", "variant": "high" }
+  "designer": { "model": "openai/gpt-6.1-terra", "variant": "medium" },
+  "fixer": { "model": "openai/gpt-6.1-terra", "variant": "high" }
 }

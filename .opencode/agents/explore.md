@@ -1,1 +1,1 @@
-/home/viethoangcr/Workspace/github/viethoangcr/llm-agents-config/agents/opencode/explore.md
+../../agents/opencode/explore.md

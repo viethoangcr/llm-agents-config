@@ -1,1 +1,1 @@
-/home/viethoangcr/Workspace/github/viethoangcr/llm-agents-config/agents/opencode/ask.md
+../../agents/opencode/ask.md

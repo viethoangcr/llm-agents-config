@@ -1,10 +1,9 @@
 {
-  "$comment": "Balanced hybrid preset for a machine with BOTH OpenAI and OpenCode Go providers. OpenAI for reasoning/knowledge/vision (orchestrator, oracle, designer; gpt-6.1-sol/gpt-6-luna, refreshed 2026-09-30); OpenCode Go deepseek-v4.1-flash for the high-volume cheap lanes (explorer, librarian, fixer). Agent selection rationale in standalone-agents/README.md 'Balanced hybrid'. Apply with: ./setup.sh --preset hybrid. Agents not listed follow the global model.",
+  "$comment": "Balanced hybrid preset for a machine with BOTH OpenAI and OpenCode Go providers, refreshed 2026-11-16. OpenAI takes the reasoning and vision lanes: GPT-6.1 Sol for orchestration/review, GPT-6.1 Terra for design and visual analysis (writing, vision, speed at $1/$5). OpenCode Go DeepSeek V4.1-Flash keeps the high-volume cheap lanes (explorer, fixer) with its $100 Go quota. Apply with: ./setup.sh --preset hybrid. Agents not listed follow the global model.",
   "orchestrator": { "model": "openai/gpt-6.1-sol", "variant": "high" },
   "oracle": { "model": "openai/gpt-6.1-sol", "variant": "xhigh" },
-  "designer": { "model": "openai/gpt-6-luna", "variant": "medium" },
+  "designer": { "model": "openai/gpt-6.1-terra", "variant": "medium" },
   "explorer": { "model": "opencode-go/deepseek-v4.1-flash", "variant": "high" },
-  "librarian": { "model": "opencode-go/deepseek-v4.1-flash", "variant": "high" },
   "fixer": { "model": "opencode-go/deepseek-v4.1-flash", "variant": "high" },
-  "observer": { "model": "opencode-go/mimo-v2.5" }
+  "observer": { "model": "openai/gpt-6.1-terra", "variant": "medium" }
 }

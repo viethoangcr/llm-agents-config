@@ -1,12 +1,11 @@
 {
-  "$comment": "Performance preset for a machine with BOTH an OpenAI subscription and OpenCode Go. Task-first split: OpenAI gpt-6.1-sol drives the synthesis/decision/implementation/design lanes (orchestrator, oracle, designer, fixer, council) with gpt-6-luna for vision (observer); OpenCode Go deepseek-v4.1-flash handles recon/docs and supplies the council's DeepSeek base advisor. Model families are restricted to GPT, DeepSeek, and GLM-5.3-Flash (GLM not required); Sol runs only at medium/high and DeepSeek only at high/max. Requires ChatGPT/Codex OAuth (OpenAI Business/Enterprise workplace entitlement) for the openai provider; Go is quota-limited per model (no automatic fallback). Covers all nine standalone agents (observer ships disabled). Apply with: ./setup.sh --preset openai-go-performance. Agents not listed follow the global model.",
+  "$comment": "Performance preset for a machine with BOTH an OpenAI subscription and OpenCode Go, refreshed 2026-11-16. OpenAI drives the synthesis/decision/implementation lanes with GPT-6.1 Sol; GPT-6.1 Terra takes design and vision (better writing/visual reasoning than Luna, much faster than Sol, $1/$5); OpenCode Go DeepSeek V4.1-Flash handles recon/docs and supplies the council's DeepSeek base advisor. Model families are restricted to GPT, DeepSeek, and GLM-5.3-Flash (GLM not required); Sol runs only at medium/high/xhigh and DeepSeek only at high/max. Requires ChatGPT/Codex OAuth (OpenAI Business/Enterprise workplace entitlement) for the openai provider; Go is quota-limited per model (no automatic fallback). Covers all eight standalone agents (observer ships disabled). Apply with: ./setup.sh --preset openai-go-performance. Agents not listed follow the global model.",
   "orchestrator": { "model": "openai/gpt-6.1-sol", "variant": "high" },
   "oracle": { "model": "openai/gpt-6.1-sol", "variant": "high" },
-  "librarian": { "model": "opencode-go/deepseek-v4.1-flash", "variant": "high" },
   "explorer": { "model": "opencode-go/deepseek-v4.1-flash", "variant": "high" },
-  "designer": { "model": "openai/gpt-6.1-sol", "variant": "high" },
+  "designer": { "model": "openai/gpt-6.1-terra", "variant": "high" },
   "fixer": { "model": "openai/gpt-6.1-sol", "variant": "high" },
-  "observer": { "model": "openai/gpt-6-luna", "variant": "medium" },
+  "observer": { "model": "openai/gpt-6.1-terra", "variant": "medium" },
   "council": { "model": "openai/gpt-6.1-sol", "variant": "high" },
   "councillor": { "model": "opencode-go/deepseek-v4.1-flash", "variant": "high" }
 }

@@ -1,13 +1,14 @@
 # MCP servers for Codex
 # Copy relevant sections into ~/.codex/config.toml
+# Each server is a [mcp_servers.<name>] table (Codex 0.163+).
 
-# Example: Context7 docs search
-# [mcp.context7]
-# type = "remote"
+# Example: Context7 docs search (remote, token from the environment)
+# [mcp_servers.context7]
 # url = "https://mcp.context7.com/mcp"
+# env_http_headers = { CONTEXT7_API_KEY = "CONTEXT7_API_KEY" }
 
-# Example: GitHub MCP
-# [mcp.github]
-# type = "local"
-# command = ["npx", "-y", "@modelcontextprotocol/server-github"]
-# environment.GITHUB_PERSONAL_ACCESS_TOKEN = "$GITHUB_PERSONAL_ACCESS_TOKEN"
+# Example: GitHub MCP (local, forwards the token from the environment)
+# [mcp_servers.github]
+# command = "npx"
+# args = ["-y", "@modelcontextprotocol/server-github"]
+# env_vars = ["GITHUB_PERSONAL_ACCESS_TOKEN"]

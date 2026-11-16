@@ -1,1 +1,1 @@
-/home/viethoangcr/Workspace/github/viethoangcr/llm-agents-config/agents/opencode/chat.md
+../../agents/opencode/chat.md

@@ -1,39 +1,43 @@
 {
-  "$comment": "Per-agent model template (optional). Copy this file to models.json, edit the values, and re-run ./setup.sh. If models.json is absent, every agent follows the global/session model (the plugin's default behavior). Model format is 'provider/model-id' (see https://opencode.ai/v2/docs/providers). A 'variant' is optional.",
+  "$comment": "Per-agent model template (optional). Copy this file to models.json, edit the values, and re-run ./setup.sh. If models.json is absent, every agent follows the global/session model (the plugin's default behavior). Model format is 'provider/model-id' (see https://opencode.ai/docs/providers). A 'variant' is optional.",
   "orchestrator": {
-    "model": "anthropic/claude-sonnet-4-6",
+    "model": "anthropic/claude-opus-5-5",
+    "variant": "high",
     "comment": "Workflow manager: strongest reasoning + tool use. Use the same model you run opencode with."
   },
   "explorer": {
-    "model": "openai/gpt-4o-mini",
-    "comment": "Fast codebase search. Cheap/fast model is fine."
-  },
-  "librarian": {
-    "model": "openai/gpt-4o",
-    "comment": "Docs/research. Needs long context + tool use (context7/gh_grep)."
+    "model": "openai/gpt-6-luna",
+    "variant": "medium",
+    "comment": "Codebase search + external docs/web research. Cheap/fast model is fine."
   },
   "oracle": {
-    "model": "anthropic/claude-opus-4-6",
+    "model": "anthropic/claude-fable-5-2",
+    "variant": "high",
     "comment": "Architecture/review. Highest-reasoning model for high-stakes decisions."
   },
   "designer": {
-    "model": "anthropic/claude-sonnet-4-6",
-    "comment": "UI/UX. Needs strong vision + taste; higher temperature (0.7) set in the agent."
+    "model": "anthropic/claude-opus-5-5",
+    "variant": "medium",
+    "comment": "UI/UX. Needs strong vision + taste."
   },
   "fixer": {
-    "model": "openai/gpt-4o",
+    "model": "anthropic/claude-sonnet-5-5",
+    "variant": "high",
     "comment": "Bounded implementation. Fast + cheap; follows the task spec."
   },
   "observer": {
-    "model": "anthropic/claude-sonnet-4-6",
+    "model": "openai/gpt-6.1-terra",
+    "variant": "medium",
     "comment": "Visual analysis. MUST be a vision-capable model. Disabled by default — remove 'disabled: true' from agents/observer.md to enable."
   },
   "council": {
-    "model": "anthropic/claude-sonnet-4-6",
+    "model": "anthropic/claude-opus-5-5",
+    "variant": "high",
     "comment": "Synthesis only, no tools. Strong summarization/reasoning."
   },
   "councillor": {
-    "model": "openai/gpt-4o",
+    "model": "opencode-go/deepseek-v4.1-flash",
+    "variant": "high",
     "comment": "Read-only advisor. Any good reasoning model."
   }
 }
