@@ -109,16 +109,13 @@ def set_model(entry, cfg):
     if model:
         variant = cfg.get("variant")
         entry["model"] = f"{model}#{variant}" if variant else model
-    temperature = cfg.get("temperature")
-    if temperature is not None:
-        entry.setdefault("request", {}).setdefault("body", {})["temperature"] = temperature
 
 def merge_models(models, source, replace=False):
     applied = 0
     for name, cfg in models.items():
         if not isinstance(cfg, dict):
             continue  # ignore non-agent keys like "$comment"
-        allowed = {k: v for k, v in cfg.items() if k in ("model", "variant", "temperature")}
+        allowed = {k: v for k, v in cfg.items() if k in ("model", "variant")}
         if not allowed:
             continue
         entry = agents.setdefault(name, {})
@@ -149,7 +146,7 @@ if os.path.exists(models_path):
     with open(models_path, encoding="utf-8") as f:
         merge_models(json.load(f), models_path)
 
-# Optional: librarian expects context7 + gh_grep MCP servers. Uncomment and
+# Optional: explorer expects context7 + gh_grep MCP servers. Uncomment and
 # fill in real server config to enable them; otherwise all agents share
 # whatever MCP servers opencode has configured globally.
 # data.setdefault("mcp", {}).setdefault("servers", {}).update({
@@ -163,4 +160,4 @@ with open(path, "w", encoding="utf-8") as f:
 print(f"default_agent -> orchestrator in {path}")
 PY
 
-echo "Done. Quit and restart opencode for the changes to take effect."
+echo "Done. OpenCode reloads agent files on save; restart only if a running session does not pick them up."

@@ -98,7 +98,7 @@ MCP server configs are stored as reference templates in `mcp/`. Each tool uses a
 |---|---|---|
 | OpenCode | `~/.config/opencode/opencode.json` → `mcp.servers` section | `mcp/opencode.json` |
 | Claude Code | `.mcp.json` or `~/.claude.json` | `mcp/claude.json` |
-| Codex | `~/.codex/config.toml` → `[mcp]` sections | `mcp/codex.toml` |
+| Codex | `~/.codex/config.toml` → `[mcp_servers.<name>]` tables | `mcp/codex.toml` |
 
 ### Agents
 

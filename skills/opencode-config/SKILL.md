@@ -22,7 +22,7 @@ This skill helps you manage OpenCode V2 configuration — config files, agents, 
 
 ## Config (`opencode.json` / `cli.json`)
 
-**Docs:** https://opencode.ai/v2/docs/config/
+**Docs:** https://opencode.ai/docs/config/
 
 The main config file uses JSON or JSONC. Locations (later wins):
 
@@ -36,26 +36,26 @@ Include the schema for editor validation:
 ```jsonc
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "anthropic/claude-sonnet-4-5",
+  "model": "anthropic/claude-sonnet-5-5",
 }
 ```
 
-Key top-level fields: `model`, `default_agent`, `permissions`, `agents`, `commands`, `providers`, `mcp`, `skills`, `plugins`, `references`, `formatter`, `lsp`, `compaction`, `watcher`, `share`, `update`, `snapshots`, `media`, `tool_output`, `experimental.policies`.
+Key top-level fields: `model`, `default_agent`, `permissions`, `agents`, `commands`, `providers`, `mcp`, `skills`, `plugins`, `references`, `formatter`, `lsp`, `compaction`, `watcher`, `share`, `update`, `snapshots`, `media`, `tool_output`, `policies`.
 
 Use `{env:VARIABLE_NAME}` for env vars in config values.
 
 Terminal/CLI preferences (theme, keybinds, diffs, session UI) live in the separate global `~/.config/opencode/cli.json`, not in `opencode.json`.
 
-**CLI docs:** https://opencode.ai/v2/docs/cli/config/ | **Schema:** https://opencode.ai/v2/cli.json
+**CLI docs:** https://opencode.ai/docs/cli/config/ | **Schema:** https://opencode.ai/v2/cli.json
 
 ## Agents
 
-**Docs:** https://opencode.ai/v2/docs/agents/
+**Docs:** https://opencode.ai/docs/agents/
 
 Agents are specialized AI assistants with custom prompts, models, and permissions. Two types:
 
-- **Primary agents** — main assistants cycled with Shift+Tab (e.g., Build, Plan)
-- **Subagents** — invoked by primary agents or via @mention (e.g., General, Explore)
+- **Primary agents** — main assistants cycled with Tab (e.g., Build, Plan)
+- **Subagents** — run in child sessions through the `subagent` tool; always background, reporting when idle
 
 Define agents in `opencode.json` under the `agents` key, or as markdown files in:
 - Global: `~/.config/opencode/agents/`
@@ -73,9 +73,6 @@ hidden: false
 disabled: false
 steps: 10
 color: "#ff6b6b"
-request:
-  body:
-    temperature: 0.1
 permissions:
   - action: edit
     resource: "*"
@@ -91,7 +88,7 @@ The filename becomes the agent name (e.g., `review.md` creates `review`). The Ma
 
 Note: V2 currently preserves `request.settings`, `request.headers`, and `request.body` but does not send them with model requests yet. Configure active request settings on the provider, model, or model variant instead.
 
-Permission actions: `read`, `edit`, `glob`, `grep`, `shell`, `subagent`, `skill`, `question`, `webfetch`, `websearch`, `external_directory`, `<server>_<tool>` for MCP tools, and plugin-defined strings. Values: `allow`, `ask`, `deny`.
+Permission actions: `read`, `edit`, `glob`, `grep`, `shell`, `subagent`, `skill`, `question`, `webfetch`, `websearch`, `external_directory`, `execute`, `<server>_<tool>` for MCP tools, and plugin-defined strings. Values: `allow`, `ask`, `deny`.
 
 JSON configuration uses the same fields under `agents.<id>`, with `system` instead of the body.
 
@@ -101,7 +98,7 @@ Agent definitions live in `agents/opencode/` and are symlinked to `~/.config/ope
 
 ## Skills
 
-**Docs:** https://opencode.ai/v2/docs/skills/
+**Docs:** https://opencode.ai/docs/skills/
 
 Skills are reusable `SKILL.md` definitions loaded on-demand via the `skill` tool. Place them in:
 
@@ -134,7 +131,7 @@ Skills live in `skills/<name>/SKILL.md` as the single source of truth. They are 
 
 ## Commands
 
-**Docs:** https://opencode.ai/v2/docs/commands/
+**Docs:** https://opencode.ai/docs/commands/
 
 Custom slash commands for repetitive tasks. Define in `opencode.json` under the `commands` key, or as markdown files in:
 - Global: `~/.config/opencode/commands/`
@@ -147,7 +144,7 @@ The legacy `command/` directory is still discovered, but use `commands/` for new
 ---
 description: Run tests with coverage
 agent: build
-model: anthropic/claude-sonnet-4-5#high
+model: anthropic/claude-sonnet-5-5#high
 subagent: true
 ---
 
@@ -159,7 +156,7 @@ The Markdown body is the template; do not put `template` in frontmatter. `subtas
 
 ## MCP Servers
 
-**Docs:** https://opencode.ai/v2/docs/mcp-servers/
+**Docs:** https://opencode.ai/docs/mcp-servers/
 
 MCP servers live under `mcp.servers` (not directly under `mcp`), and use `disabled` instead of `enabled`:
 
@@ -203,7 +200,7 @@ MCP templates are in `mcp/opencode.json`. Users copy relevant sections into thei
 
 ## Plugins
 
-**Docs:** https://opencode.ai/v2/docs/plugins/ and https://opencode.ai/v2/docs/build/plugins/
+**Docs:** https://opencode.ai/docs/plugins/ and https://opencode.ai/docs/build/plugins/
 
 Plugins extend OpenCode with tools, hooks, and integrations. Configure them in `opencode.json` under `plugins`:
 
@@ -219,11 +216,11 @@ V1 plugin implementations do not run in V2; port them with the plugin migration 
 
 ## Rules / AGENTS.md
 
-**Docs:** https://opencode.ai/v2/docs/instructions/
+**Docs:** https://opencode.ai/docs/instructions/
 
 Project instructions go in `AGENTS.md`. OpenCode loads the global `~/.config/opencode/AGENTS.md` first, then every `AGENTS.md` from the workspace up toward the home directory. V2 recognizes `AGENTS.md` only (no `CLAUDE.md` fallback).
 
-The `instructions` config field is accepted but not resolved in V2; use `AGENTS.md` for active instructions.
+The `instructions` config field adds extra instruction files or globs alongside discovered `AGENTS.md` files.
 
 ### Rule File Locations in This Repo
 
@@ -232,7 +229,7 @@ The `instructions` config field is accepted but not resolved in V2; use `AGENTS.
 
 ## Permissions
 
-**Docs:** https://opencode.ai/v2/docs/permissions/ and https://opencode.ai/v2/docs/tools/ and https://opencode.ai/v2/docs/policies/
+**Docs:** https://opencode.ai/docs/permissions/ and https://opencode.ai/docs/tools/ and https://opencode.ai/docs/policies/
 
 Control tool access with ordered rules; the last matching rule wins:
 
@@ -249,7 +246,7 @@ Control tool access with ordered rules; the last matching rule wins:
 
 Permission values: `allow` (no prompt), `ask` (prompt for approval), `deny` (blocked). Glob patterns use `*` and `?`; a shell pattern ending in ` *` also matches the command without arguments.
 
-Provider allow/deny lists moved to policies under `experimental.policies` (`provider.use` statements), which use the same ordered last-match-wins format.
+Provider allow/deny lists use top-level `policies` (`provider.use` statements), which use the same ordered last-match-wins format. `experimental.policies` still merges but is deprecated in V2.
 
 ## Key Rules for This Repo
 

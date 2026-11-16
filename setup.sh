@@ -46,7 +46,7 @@ copy_if_missing() {
 merge_opencode_policies() {
   local src="$1" dst="$2"
   python3 - "$src" "$dst" <<'PY'
-import json, os, sys
+import json, sys
 
 source_path, target_path = sys.argv[1:3]
 with open(source_path, encoding="utf-8") as f:
@@ -54,20 +54,27 @@ with open(source_path, encoding="utf-8") as f:
 with open(target_path, encoding="utf-8") as f:
     target = json.load(f)
 
-managed = source.get("experimental", {}).get("policies", [])
+managed = source.get("policies", [])
 if not isinstance(managed, list):
-    raise SystemExit(f"error: experimental.policies must be a list in {source_path}")
+    raise SystemExit(f"error: policies must be a list in {source_path}")
 
-experimental = target.setdefault("experimental", {})
-if not isinstance(experimental, dict):
-    raise SystemExit(f"error: experimental must be an object in {target_path}")
-policies = experimental.setdefault("policies", [])
+policies = target.get("policies", [])
 if not isinstance(policies, list):
-    raise SystemExit(f"error: experimental.policies must be a list in {target_path}")
+    raise SystemExit(f"error: policies must be a list in {target_path}")
+
+# Migrate V2.0-V2.2 configs that still keep policies under experimental.
+experimental = target.get("experimental")
+if isinstance(experimental, dict):
+    legacy = experimental.pop("policies", None)
+    if isinstance(legacy, list):
+        policies = policies + legacy
+    if not experimental:
+        target.pop("experimental", None)
 
 managed_entries = {json.dumps(item, sort_keys=True) for item in managed}
-policies[:] = [item for item in policies if json.dumps(item, sort_keys=True) not in managed_entries]
+policies = [item for item in policies if json.dumps(item, sort_keys=True) not in managed_entries]
 policies.extend(managed)
+target["policies"] = policies
 
 with open(target_path, "w", encoding="utf-8") as f:
     json.dump(target, f, indent=2)
@@ -114,10 +121,11 @@ for agent in "$REPO"/agents/opencode/*.md; do
   link_over "$agent" "$HOME/.config/opencode/agents/$name.md"
 done
 
-# User-scope agents — also symlink into .opencode/agents/ for per-project discovery
+# User-scope agents — also symlink into .opencode/agents/ for per-project discovery.
+# Keep these relative so the tracked repo-local links work after a clone.
 for agent in "$REPO"/agents/opencode/*.md; do
   name=$(basename "${agent%.md}")
-  link_over "$agent" "$REPO/.opencode/agents/$name.md"
+  link_over "../../agents/opencode/$name.md" "$REPO/.opencode/agents/$name.md"
 done
 
 # Config — opencode.json (copy, not symlink — OpenCode may write to it)
